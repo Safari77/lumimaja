@@ -528,7 +528,7 @@ void COptions::CreateControls()
 
   wxBoxSizer* itemBoxSizer97 = new wxBoxSizer(wxVERTICAL);
   itemBoxSizer87->Add(itemBoxSizer97, 0, wxGROW|wxALL, 5);
-  wxStaticText* itemStaticText98 = new wxStaticText( itemPanel86, wxID_STATIC, _("Argon2 mem usage:"), wxDefaultPosition, wxDefaultSize, 0 );
+  wxStaticText* itemStaticText98 = new wxStaticText( itemPanel86, wxID_STATIC, _("Argon2 memory usage"), wxDefaultPosition, wxDefaultSize, 0 );
   itemBoxSizer97->Add(itemStaticText98, 0, wxALIGN_LEFT|wxALL, 5);
 
   wxSlider* itemSlider100 = new wxSlider( itemPanel86, ID_SLIDER, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS );
@@ -546,7 +546,7 @@ void COptions::CreateControls()
 
   wxBoxSizer* itemBoxSizer98 = new wxBoxSizer(wxVERTICAL);
   itemBoxSizer87->Add(itemBoxSizer98, 0, wxGROW|wxALL, 5);
-  wxStaticText* itemStaticText99 = new wxStaticText( itemPanel86, wxID_STATIC, _("Argon2 passes:"), wxDefaultPosition, wxDefaultSize, 0 );
+  wxStaticText* itemStaticText99 = new wxStaticText( itemPanel86, wxID_STATIC, _("Argon2 passes"), wxDefaultPosition, wxDefaultSize, 0 );
   itemBoxSizer98->Add(itemStaticText99, 0, wxALIGN_LEFT|wxALL, 5);
 
   wxSlider* itemSlider99 = new wxSlider( itemPanel86, ID_SLIDER, 5, MIN_HASH_PASSES, MAX_HASH_PASSES, wxDefaultPosition, wxDefaultSize,
@@ -555,12 +555,12 @@ void COptions::CreateControls()
 
   wxBoxSizer* itemBoxSizer101 = new wxBoxSizer(wxHORIZONTAL);
   itemBoxSizer98->Add(itemBoxSizer101, 0, wxGROW|wxALL, 5);
-  wxStaticText* itemStaticText103 = new wxStaticText( itemPanel86, wxID_STATIC, _("Min"), wxDefaultPosition, wxDefaultSize, 0 );
+  wxStaticText* itemStaticText103 = new wxStaticText( itemPanel86, wxID_STATIC, _("Minimum"), wxDefaultPosition, wxDefaultSize, 0 );
   itemBoxSizer101->Add(itemStaticText103, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
   itemBoxSizer101->Add(10, 13, 10, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-  wxStaticText* itemStaticText104 = new wxStaticText( itemPanel86, wxID_STATIC, _("Max"), wxDefaultPosition, wxDefaultSize, 0 );
+  wxStaticText* itemStaticText104 = new wxStaticText( itemPanel86, wxID_STATIC, _("Maximum"), wxDefaultPosition, wxDefaultSize, 0 );
   itemBoxSizer101->Add(itemStaticText104, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 

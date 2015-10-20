@@ -203,7 +203,7 @@ void PwsafeApp::Init()
   wxLocale::AddCatalogLookupPathPrefix(L"/usr/share/locale");
   wxLocale::AddCatalogLookupPathPrefix(L"/usr");
   wxLocale::AddCatalogLookupPathPrefix(L"/usr/local");
-#if defined(__WXDEBUG__) || defined(_DEBUG) || defined(DEBUG)
+#if defined(_DEBUG) || defined(DEBUG)
   wxLocale::AddCatalogLookupPathPrefix(L"../I18N/mos");
 #endif
 
@@ -494,7 +494,7 @@ wxLanguage PwsafeApp::GetSystemLanguage()
     language = wxLocale::GetSystemLanguage();
   }
 #endif
-
+  fprintf(stderr, "PwsafeApp::GetSystemLanguage %d\n", language);
   return static_cast<wxLanguage>(language);
 }
 

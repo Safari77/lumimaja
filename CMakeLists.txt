@@ -21,7 +21,7 @@ if(NOT NO_YUBI)
 endif(NOT NO_YUBI)
 CHECK_LIBRARY_EXISTS(sodium sodium_init "sodium.h" HAVE_SODIUM_H)
 
-set(wxWidgets_CONFIGURATION mswud)
+set(wxWidgets_CONFIGURATION mswu)
 set(wxWidgets_CONFIG_EXECUTABLE wx-config-3.0)
 find_package(wxWidgets COMPONENTS adv base core html REQUIRED)
 include(${wxWidgets_USE_FILE})
