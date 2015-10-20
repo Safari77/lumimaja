@@ -8,3 +8,7 @@ Yubikey support (ykpers) is autodetected,
   "cmake -D NO_YUBI=1"
 to disable it.
 
+Argon2d is used, please read Argon2 spec what it means.
+Argon2 specification can still change, I don't add compatibility code
+for Lumimaja if it does.
+

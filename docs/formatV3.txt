@@ -62,7 +62,8 @@ are included in the KDF function.
 2.6 H(P') is BLAKE2B(P')-128, and is used to verify that the user has the
 correct passphrase.
 
-2.7 All following records are encrypted using chacha20poly1305.
+2.7 All following records are encrypted using chacha20poly1305 with 64-bit
+nonce. [TLS-CHACHA20POLY1305]
 
 2.8 ENCSZ: 64bit size of the following encrypted data.
 This allows for detection of truncated databases.
@@ -508,7 +509,7 @@ interoperablity.
 
 5. References:
 [BLAKE2B] https://blake2.net/blake2.pdf
-http://csrc.nist.gov/publications/fips/fips180-2/fips180-2withchangenotice.pdf
 [ARGON2] https://www.cryptolux.org/images/0/0d/Argon2.pdf
+[TLS-CHACHA20POLY1305] https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305-04
 
 End of Format description.

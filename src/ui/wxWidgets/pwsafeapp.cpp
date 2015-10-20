@@ -494,7 +494,6 @@ wxLanguage PwsafeApp::GetSystemLanguage()
     language = wxLocale::GetSystemLanguage();
   }
 #endif
-  fprintf(stderr, "PwsafeApp::GetSystemLanguage %d\n", language);
   return static_cast<wxLanguage>(language);
 }
 
@@ -567,7 +566,6 @@ bool PwsafeApp::ActivateLanguage(wxLanguage language, bool tryOnly)
 
 int PwsafeApp::OnExit()
 {
-  fprintf(stderr, "PwsafeApp::OnExit start\n");
   m_idleTimer->Stop();
   recentDatabases().Save();
   PWSprefs *prefs = PWSprefs::GetInstance();
@@ -580,7 +578,6 @@ int PwsafeApp::OnExit()
 
   PWSMenuShortcuts::DestroyShortcutsManager();
 ////@begin PwsafeApp cleanup
-  fprintf(stderr, "PwsafeApp::OnExit end\n");
   return wxApp::OnExit();
 ////@end PwsafeApp cleanup
 }
