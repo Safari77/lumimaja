@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2003-2015 Rony Shapiro <ronys@users.sourceforge.net>.
+ * All rights reserved. Use of the code is allowed under the
+ * Artistic License 2.0 terms, as specified in the LICENSE file
+ * distributed with this code, or available from
+ * http://www.opensource.org/licenses/artistic-license-2.0.php
+ */
+
+/** \file version.h
+ * 
+ */
+
+#ifndef _VERSION_H_
+#define _VERSION_H_
+
+#include <wx/string.h>
+
+#ifdef linux
+#define APPNAME _T("Lumimaja (linux)")
+#else
+#define APPNAME _T("Lumimaja (wxWidgets)")
+#endif
+
+#define MAJORVERSION @lumimaja_VERSION_MAJOR@
+#define MINORVERSION @lumimaja_VERSION_MINOR@
+#define REVISION     0
+
+// define following for custom/experimental versions
+#define SPECIALBUILD _T("beta")
+
+#ifndef SPECIALBUILD
+#define SPECIALBUILD _T("")
+#endif
+
+extern const wxString pwsafeAppName;
+extern const wxString pwsafeVersionString;
+
+#endif /* _VERSION_H_ */

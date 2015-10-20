@@ -1,0 +1,10 @@
+Lumimaja - PasswordSafe with Argon2 KDF, data encrypted with AEAD
+chacha20poly1305, proper error checking for corrupted or truncated databases.
+
+To install:
+mkdir build && cd build && cmake .. && make -j4
+
+Yubikey support (ykpers) is autodetected,
+  "cmake -D NO_YUBI=1"
+to disable it.
+

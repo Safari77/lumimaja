@@ -1,0 +1,150 @@
+Password Safe 3.37.1 Release Notes - October 2015
+=================================================
+
+This note describe the new features, fixed bugs and known problems
+with the latest versions of Password Safe. For a short description of
+Password Safe, please see the accompanying README.txt file. For more 
+information on the product and the project, please visit
+http://passwordsafe.sourceforge.net. Details about changes to older
+releases may be found in the file ChangeLog.txt.
+
+Bugs fixed in 3.37.1
+====================
+[] Fixed crash when adding/editing an entry with wide version of
+dialog.
+
+New Features for 3.37
+=====================
+[] The Notes External Editor now accepts environment strings (e.g. %windir%)
+in the path to the editor.
+[789] If the double-click action (or shift-double-click) of an entry
+is set to Edit/View Entry, then (shift-) double-clicking on its
+shortcut will edit/view the base entry. The selected shortcut entry
+can still be viewed/edited via menu, right-click or just hitting Enter.
+[782] Notes field font is now user-configurable.
+[781] Virtual Keyboard - allow playing sound when a valid or invalid key
+is pressed and add caption to the Space Bar (Partial implementation of
+this Feature Request).
+
+Bugs fixed in 3.37
+==================
+[1274] References to base entries are now scrollable, no longer
+truncated.
+[1273] Find in the Tree View will now ensure that any found entry will be
+visible by scrolling appropriately.
+[1272] XML export of single entry using default Password policy now
+works correctly.
+[1270] Display Filter dropdown list of filter fields now fits on low
+resolution screens.
+[1269] Filters containing Password Policy Names now export/import
+correctly to/from XML.
+[1267] Export from a YubiKey-protected database to another database
+fixed.
+[1261] 'Unlock Difficulty' slider is now correctly initialised in the Manage
+Options Security tab.
+[1260] If Password Safe is unable to find the user specified external editor,
+the external edit is cancelled and the Notes field remains unchanged.
+[1258] Group dropdown box width no longer trucates long group paths.
+[1254] Toolbar customisation now has correctly aligned text/images.
+[1244] Changes to symbol set in default password policy are respected
+when "Use easy-to-read characters" is set.
+[1230] "Open as read-only" check-box correctly set when opening a R/W database
+after previously opening/selecting a R-O database.
+[1204] Show correct icon color in system tray when unminimizing with
+no database open.
+[1124] Autotype on a shortcut entry now picks up title, group and user
+fields from shortcut instead of base.
+[1082] Field modification times set to creation time for list view and
+entry's time and date tab. This is more useful than "N/A", e.g., for
+sorting by password modification to find old passwords that should be
+changed.
+[1054] Password Variable in Run Command correctly set when executed from an alias.
+
+New Features for 3.36
+=====================
+[] Entries and Groups can be exported to plain text, XML, or to a new
+PasswordSafe file.
+[777] Added command line option to force choice of tall or wide dialog screens.
+[772] Added a tooltip for the copy-to-clipboard button in the generator.
+[768] Caps Lock indicator added to passphrase entry dialogs.
+
+Bugs fixed in 3.36
+==================
+[1248] Non-ASCII symbols can now be specified in Password Policies.
+[1245] Asterisk is now accepted as a symbol in Password Policies.
+[1233] Don't count unchecked character types in password policies when
+checking for consistency.
+[1231] Relax restriction on easy-vision password policy + more
+consistent UI.
+[1229] Hex digits checkbox can be selected in Generate Passwords.
+[1228] Fixed incompatability with Password Policies generated with
+previous versions.
+[1226] Fixed regression in Find toolbar functionality.
+
+
+Bugs fixed in 3.35
+==================
+[1221] Support newer YubiKeys in all modes.
+[1212] In the Flattened List view, keep the icon column, if present,
+as leftmost, to ensure proper display.
+[1211] The Read-Only checkbox no longer clears itself after returning
+from the file selection dialog. Also, the read-only checkbox in XP
+file selection dialog is handled correctly.
+[1210] CurrentFile preference is updated sooner rather than later, so
+last database is set as default for next invocation.
+
+Changes to Existing Features in 3.35
+====================================
+[760] Password Policy: You can now choose a character set without
+requiring at least one character from that set (i.e., minimum required
+can be zero).
+
+New Features for 3.34.1
+=======================
+[753] A Password Safe database can be opened by drag & drop to the
+Password Safe application window.
+[749]	Clicking or double-clicking on a previous password in an entry's
+Password History selects it.
+[746]	Password Policy "Special Symbol Set" simplified.
+
+Changes to Existing Features in 3.34.1
+======================================
+[397] Clarified use of -g and PWS_PREFSDIR.
+
+Bugs fixed in 3.34.1
+====================
+[1205] 3.34.1 fixes a bug that crept into 3.34: The OK button was
+disabled when a database was selected on the opening window.
+[1200] Tweak Yubikey interface to make it easier to use when creating
+or opening a Password Safe database.
+[1195] Edit->Find now enabled when a group is selected.
+[1194] Compare, Merge, Sync: Enable action button when password's
+entered via virtual keyboard.
+[1176] Tweak definition of what's considered a 'weak' password.
+[1174] "Open as read-only" check-box now correctly reflects the file's state.
+[1117] Dragging dropbar icon doesn't copy text to clipboard unless
+Control key's pressed when icon's clicked upon.
+
+New Features for 3.33
+=====================
+[728] The default delay between characters on autotype is now
+configurable.
+
+Changes to Existing Features in 3.33
+====================================
+None
+
+Bugs fixed in 3.33
+==================
+[1160] Don't create config dir if config file passed in command line.
+[1155] Number of shortcuts is now correctly initialized.
+[1148] No longer crashes when canceling unlock with expired password entries.
+[1146] Edit button now enabled correctly in Manage->Password Policies.
+[1139] Backup file numbers now rollover 999 correctly.
+[1134] Filtering by type now works correctly for shortcuts & shortcut
+bases.
+[1130] Database field isn't highlighted when it doesn't have the
+focus.
+[1125] Increased range of unlock difficulty by a factor of four. This
+should give an order or magnitude or so between max and min settings.
+[1067] Fail gracefully when trying to encrypt a file > 2GB.
