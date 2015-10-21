@@ -82,11 +82,10 @@ mandatory fields may either be absent or have zero length. When a field is
 absent or zero-length, its default value shall be used. Aside from the
 'END' field, no order is assumed on the field types.
 
-2.9 TAG: The 128-bit poly1305 authentication tag.
-The value is calculated over all of
-the plaintext fields, that is, over all the data stored in all fields
-(starting from the version number in the header, ending with the last field
-of the last record).
+2.9 TAG: The 128-bit poly1305 authentication tag (encrypt-then-MAC).
+The value is calculated over all of the encrypted fields, that is,
+over all the data stored in all fields (starting from the version number in
+the header, ending with the last field of the last record).
 
 3. Fields: Data in Lumimaja is stored in typed fields. Each field
 consists of one or more blocks.
