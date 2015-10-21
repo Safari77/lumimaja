@@ -1,2 +1,5 @@
 Some cmake wizard please fix core_st handling.
 
+Normalize passwords using OpaqueString profile of the
+PRECIS FreeformClass (RFC7564, RFC7613).
+
