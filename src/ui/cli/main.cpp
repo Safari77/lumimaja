@@ -29,7 +29,7 @@ static void echoOn();
 
 static int ImportText(PWScore &core, const StringX &fname);
 static int ImportXML(PWScore &core, const StringX &fname);
-static const char *status_text(int status);
+static const char *status_text(PWScore::RETURNVALUE);
 
 //-----------------------------------------------------------------
 
@@ -228,27 +228,9 @@ static void echoOn()
   }
 }
 
-static const char *status_text(int status)
+static const char *status_text(PWScore::RETURNVALUE val)
 {
-  switch (status) {
-  case PWScore::SUCCESS: return "SUCCESS";
-  case PWScore::FAILURE: return "FAILURE";
-  case PWScore::CANT_OPEN_FILE: return "CANT_OPEN_FILE";
-  case PWScore::USER_CANCEL: return "USER_CANCEL";
-  case PWScore::WRONG_PASSWORD: return "WRONG_PASSWORD";
-  case PWScore::BAD_DIGEST: return "BAD_DIGEST";
-  case PWScore::UNKNOWN_VERSION: return "UNKNOWN_VERSION";
-  case PWScore::NOT_SUCCESS: return "NOT_SUCCESS";
-  case PWScore::ALREADY_OPEN: return "ALREADY_OPEN";
-  case PWScore::INVALID_FORMAT: return "INVALID_FORMAT";
-  case PWScore::USER_EXIT: return "USER_EXIT";
-  case PWScore::XML_FAILED_VALIDATION: return "XML_FAILED_VALIDATION";
-  case PWScore::XML_FAILED_IMPORT: return "XML_FAILED_IMPORT";
-  case PWScore::LIMIT_REACHED: return "LIMIT_REACHED";
-  case PWScore::UNIMPLEMENTED: return "UNIMPLEMENTED";
-  case PWScore::NO_ENTRIES_EXPORTED: return "NO_ENTRIES_EXPORTED";
-  default: return "UNKNOWN ?!";
-  }
+  return PWScore::GetReturnValueString(val);
 }
 
 static int

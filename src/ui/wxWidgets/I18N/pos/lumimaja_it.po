@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lumimaja ITA v0.94\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-20 23:14+0300\n"
+"POT-Creation-Date: 2015-10-22 14:34+0300\n"
 "PO-Revision-Date: 2014-06-28 14:48+0200\n"
 "Last-Translator: Luca Mariot <rymoah@users.sourceforge.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -515,10 +515,6 @@ msgstr "Usato anche per sostituire i punti nel campo Titolo"
 
 msgid "Advanced..."
 msgstr "Avanzate..."
-
-#, fuzzy
-msgid "Build date:"
-msgstr "Data di compilazione: "
 
 msgid "Please visit the "
 msgstr "Visita il"
@@ -3481,6 +3477,10 @@ msgstr ""
 #, c-format
 msgid "Yes - At least %d from %ls: %ls"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Build date:"
+#~ msgstr "Data di compilazione: "
 
 #, fuzzy
 #~ msgid "Min"

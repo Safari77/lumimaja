@@ -1294,7 +1294,7 @@ int PasswordSafeFrame::Open(const wxString &fname)
       they saved their file....
       */
       return PWScore::CANT_OPEN_FILE;
-    case PWScore::BAD_DIGEST:
+    case PWScore::CRYPTO_ERROR:
     {
       temp.Format(IDS_FILECORRUPT, pszFilename.c_str());
       const int yn = MessageBox(temp, cs_title, MB_YESNO|MB_ICONERROR);

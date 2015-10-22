@@ -607,7 +607,7 @@ wxString SyncStatusPage::GetReadErrorMessageTemplate(int rc)
   switch (rc) {
     case PWScore::CANT_OPEN_FILE:
       return _("%ls\n\nCould not open file for reading!");
-    case PWScore::BAD_DIGEST:
+    case PWScore::CRYPTO_ERROR:
       return _("%ls\n\nFile corrupt or truncated!\nData may have been lost or modified.");
     default:
       return _("%ls\n\nUnknown error");

@@ -128,24 +128,20 @@ public:
     UNSUPPORTED_VERSION,
     DB_HAS_CHANGED,
     WRONG_PASSWORD,
-    BAD_DIGEST,
     TRUNCATED_FILE,
+    CRYPTO_ERROR,
     END_OF_FILE,
     READ_FAIL,
     WRITE_FAIL,
     ARGON2_FAIL,
-    CRYPTO_ERROR,
     UNKNOWN_VERSION,
-    NOT_SUCCESS,
     ALREADY_OPEN,
     INVALID_FORMAT,
     USER_EXIT,
     XML_FAILED_VALIDATION,
     XML_FAILED_IMPORT,
-    LIMIT_REACHED,
     UNIMPLEMENTED,
     NO_ENTRIES_EXPORTED,
-    DB_HAS_DUPLICATES,
     OK_WITH_ERRORS,
     OK_WITH_VALIDATION_ERRORS,
     OPEN_NODB
@@ -491,6 +487,8 @@ public:
   size_t GetRawdatasize() const;
   void SetRawdatasize(size_t value);
 
+  const std::string& GetReturnValueString(int ret);
+
 protected:
   bool m_isAuxCore; // set in c'tor, if true, never update prefs from DB.  
 private:
@@ -571,6 +569,8 @@ private:
 
   stringT m_AppNameAndVersion;
   PWSfile::VERSION m_ReadFileVersion;
+
+  static std::map<int, std::string> ReturnValueString;
 
   bool m_bDBChanged;
   bool m_bDBPrefsChanged;

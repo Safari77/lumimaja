@@ -110,30 +110,11 @@ bool DbSelectionPanel::DoValidation()
     }
 
     StringX combination = m_sc->GetCombination();
-    const char *err;
     //Does the combination match?
-    switch(m_core->CheckPasskey(tostringx(wxfn.GetFullPath()), combination)) {
-    case PWScore::SUCCESS:
+    int ret = m_core->CheckPasskey(tostringx(wxfn.GetFullPath()), combination);
+    if (ret == PWScore::SUCCESS)
       return true;
-    case PWScore::TRUNCATED_FILE:
-      err = "Lumimaja database was truncated";;
-      break;
-    case PWScore::CRYPTO_ERROR:
-      err = "Corrupt Lumimaja database or unsupported cipher/hash";
-      break;
-    case PWScore::ARGON2_FAIL:
-      err = "Argon2 key derivation function failed, out of memory?";
-      break;
-    case PWScore::WRONG_PASSWORD:
-      err = "Incorrect passkey";
-      break;
-    case PWScore::NOT_LUMI3_FILE:
-      err = "Not Lumimaja database";
-    default:
-      err = "Unknown error checking passkey";
-      break;
-    }
-    wxString errmess(_(err));
+    wxString errmess(_(m_core->GetReturnValueString(ret)));
     wxMessageBox(errmess, _("Error"), wxOK | wxICON_ERROR, this);
     SelectCombinationText();
     return false;

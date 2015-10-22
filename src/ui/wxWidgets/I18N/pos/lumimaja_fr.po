@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-20 23:14+0300\n"
+"POT-Creation-Date: 2015-10-22 14:34+0300\n"
 "PO-Revision-Date: 2011-10-12 16:57-0800\n"
 "Last-Translator: François Lamoureux <franklamoureux@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -573,9 +573,6 @@ msgstr "Utilisé aussi pour remplacer les points dans le champ Titre."
 #, fuzzy
 msgid "Advanced..."
 msgstr "Avancé"
-
-msgid "Build date:"
-msgstr ""
 
 #, fuzzy
 msgid "Please visit the "

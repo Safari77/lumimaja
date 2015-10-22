@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-20 23:14+0300\n"
+"POT-Creation-Date: 2015-10-22 14:34+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -563,10 +563,6 @@ msgstr "Zastępuje także kropki w polu nazwy."
 #, fuzzy
 msgid "Advanced..."
 msgstr "Zaawansowane..."
-
-#, fuzzy
-msgid "Build date:"
-msgstr "Data zbudowania: "
 
 #, fuzzy
 msgid "Please visit the "
@@ -3749,6 +3745,10 @@ msgstr "Tak - wymiawialne symbole: %ls"
 #, fuzzy, c-format
 msgid "Yes - At least %d from %ls: %ls"
 msgstr "Tak - co najwyżej %d z %ls: %ls"
+
+#, fuzzy
+#~ msgid "Build date:"
+#~ msgstr "Data zbudowania: "
 
 #, fuzzy
 #~ msgid "Min"

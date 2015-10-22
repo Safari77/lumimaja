@@ -273,35 +273,20 @@ void CSafeCombinationPrompt::ProcessPhrase()
   fprintf(stderr, "CSafeCombinationPrompt::ProcessPhrase %d\n", status);
   switch(status) {
   case PWScore::SUCCESS:
-   m_core.SetCurFile(tostringx(m_filename));
-   EndModal(wxID_OK);
-   return;
-  case PWScore::TRUNCATED_FILE:
-		err = "Lumimaja database was truncated";;
-		break;
-	case PWScore::CRYPTO_ERROR:
-		err = "Corrupt Lumimaja database or unsupported cipher/hash";
-		break;
-	case PWScore::ARGON2_FAIL:
-		err = "Argon2 key derivation function failed, out of memory?";
-		break;
-	case PWScore::WRONG_PASSWORD:
-		err = "Incorrect passkey";
-		break;
-  case PWScore::NOT_LUMI3_FILE:
-    err = "Not Lumimaja database";
+    m_core.SetCurFile(tostringx(m_filename));
+    EndModal(wxID_OK);
+    return;
+  default:
+    err = m_core.GetReturnValueString(status);
     break;
-	default:
-		err = "Unknown error checking passkey";
-		break;
-	}
+  }
 
   m_core.SetCurFile(L"");
-	wxMessageDialog errdg(this, err, _("Error"), wxOK | wxICON_EXCLAMATION);
-	errdg.ShowModal();
-	wxTextCtrl *txt = dynamic_cast<wxTextCtrl *>(FindWindow(ID_PASSWORD));
-	txt->SetSelection(-1,-1);
-	txt->SetFocus();
+  wxMessageDialog errdg(this, err, _("Error"), wxOK | wxICON_EXCLAMATION);
+  errdg.ShowModal();
+  wxTextCtrl *txt = dynamic_cast<wxTextCtrl *>(FindWindow(ID_PASSWORD));
+  txt->SetSelection(-1,-1);
+  txt->SetFocus();
 }
 
 /*!

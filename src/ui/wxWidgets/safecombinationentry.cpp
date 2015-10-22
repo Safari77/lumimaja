@@ -363,6 +363,7 @@ int CSafeCombinationEntry::ProcessPhrase()
   m_core.SetReadOnly(m_readOnly);
   int status = m_core.ReadCurFile(m_password);
   fprintf(stderr, "CSafeCombinationEntry::ProcessPhrase %d\n", status);
+
   switch(status) {
   case PWScore::SUCCESS:
     wxGetApp().recentDatabases().AddFileToHistory(m_filename);
@@ -374,23 +375,8 @@ int CSafeCombinationEntry::ProcessPhrase()
       err = str.c_str();
     }
     break;
-  case PWScore::TRUNCATED_FILE:
-    err = "Lumimaja database was truncated";;
-    break;
-  case PWScore::CRYPTO_ERROR:
-    err = "Corrupt Lumimaja database or unsupported cipher/hash";
-    break;
-  case PWScore::ARGON2_FAIL:
-    err = "Argon2 key derivation function failed, out of memory?";
-    break;
-  case PWScore::WRONG_PASSWORD:
-    err = "Incorrect passkey";
-    break;
-  case PWScore::NOT_LUMI3_FILE:
-    err = "Not Lumimaja database";
-   break;
   default:
-    err = "Unknown error checking passkey";
+    err = m_core.GetReturnValueString(status);
     break;
   }
 	// here iff ReadCurFile failed.

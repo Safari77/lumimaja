@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lumimaja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-20 23:14+0300\n"
+"POT-Creation-Date: 2015-10-22 14:34+0300\n"
 "PO-Revision-Date: 2015-02-22 02:05+0100\n"
 "Last-Translator: \n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -526,9 +526,6 @@ msgstr "Auch benutzt um Punktzeichen im Titel-Feld zu ersetzen."
 
 msgid "Advanced..."
 msgstr "Erweitert..."
-
-msgid "Build date:"
-msgstr "Erstellungsdatum: "
 
 msgid "Please visit the "
 msgstr "Bitte besuchen Sie die "
@@ -3575,6 +3572,9 @@ msgstr "Ja - Aussprechbare Symbole: %ls"
 #, c-format
 msgid "Yes - At least %d from %ls: %ls"
 msgstr "Ja - Mindestens %d von %ls: %ls"
+
+#~ msgid "Build date:"
+#~ msgstr "Erstellungsdatum: "
 
 #, fuzzy
 #~ msgid "Min"

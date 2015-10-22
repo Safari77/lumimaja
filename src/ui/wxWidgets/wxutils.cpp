@@ -57,7 +57,7 @@ int ReadCore(PWScore& othercore, const wxString& file, const StringX& combinatio
                     _("File Read Error"), wxOK | wxICON_ERROR, msgboxParent );
       break;
 
-    case PWScore::BAD_DIGEST:
+    case PWScore::CRYPTO_ERROR:
       if (showMsgbox && wxMessageBox(wxString(file) << wxT("\n\n") << _("File corrupt or truncated!\nData may have been lost or modified.\nContinue anyway?"),
             _("File Read Error"), wxYES_NO | wxICON_QUESTION, msgboxParent) == wxYES) {
         rc = PWScore::SUCCESS;

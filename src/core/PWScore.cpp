@@ -103,6 +103,36 @@ PWScore::~PWScore()
   delete m_pFileSig;
 }
 
+std::map<int, std::string> PWScore::ReturnValueString = {
+  { SUCCESS, "Success" },
+  { FAILURE, "General failure" },
+  { NOT_LUMI3_FILE, "Not Lumimaja database" },
+  { UNSUPPORTED_VERSION, "Unsupported version" },
+  { DB_HAS_CHANGED, "Database has changed" },
+  { WRONG_PASSWORD, "Incorrect passkey" },
+  { TRUNCATED_FILE, "Lumimaja database was truncated" },
+  { READ_FAIL, "Read error" },
+  { WRITE_FAIL, "Write error" },
+  { ARGON2_FAIL, "Argon2 key derivation function failed, out of memory?" },
+  { CRYPTO_ERROR, "Corrupt Lumimaja database or unsupported cipher/hash" },
+  { ALREADY_OPEN, "That file is already open." },
+  { INVALID_FORMAT, "Invalid format" },
+  { USER_EXIT, "User exit" },
+  { UNIMPLEMENTED, "XML import not supported in this release" },
+  { NO_ENTRIES_EXPORTED, "No entries satisfied your selection criteria and so none were exported!" }
+}; 
+
+const std::string& PWScore::GetReturnValueString(int ret)
+{
+  static const std::string sUnkn("Unknown error");
+  std::map<int, std::string>::iterator it =
+    PWScore::ReturnValueString.find(ret);
+  if (it == PWScore::ReturnValueString.end())
+    return sUnkn;
+  else
+    return it->second;
+}
+
 void PWScore::SetApplicationNameAndVersion(const stringT &appName,
                                            DWORD dwMajorMinor)
 {
