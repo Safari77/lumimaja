@@ -43,6 +43,11 @@ public:
     HDR_LAST,                             // Start of unknown fields!
     HDR_END                   = 0xff};    // header field types, per formatV{2,3}.txt
 
+  enum V3_ARGON2 {
+    V3_ARGON2_DS = 0,
+    V3_ARGON2_ID
+  };
+
   enum V3_AEAD {
     V3_AEAD_CHACHA20POLY1305 = 0,
     V3_AEAD_NORX6461
@@ -62,6 +67,7 @@ public:
   struct TAGHDR { // fed to Argon2 as Associated Data
     enum { V3TAGLEN = 4 };
     uint8_t tag[V3TAGLEN];
+    uint8_t Argon2Type;
     uint8_t AEAD;
     uint8_t Hash;
   } __attribute__((packed));

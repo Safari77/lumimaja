@@ -49,6 +49,19 @@ PWSfileV3::~PWSfileV3()
   fprintf(stderr, "bye PWSfileV3 %p\n", this);
 }
 
+typedef int (*argon2fun)(Argon2_Context*);
+
+typedef struct {
+  argon2fun f;
+  uint8_t name[3];
+} argon2funmap;
+
+// not overengineering at all
+static argon2funmap argon2funmaps[256] = {
+  [PWSfileV3::V3_ARGON2_DS] = { &Argon2ds, "ds" },
+  [PWSfileV3::V3_ARGON2_ID] = { &Argon2id, "id" }
+};
+
 bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *taghdr, unsigned char *out, size_t outlen,
                                unsigned char *salt, size_t saltlen, uint32 t_cost, uint32 m_cost, uint32 nLanes)
 {
@@ -56,16 +69,22 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
   unsigned char *pstr = NULL;
   ConvertString(passkey, pstr, passLen);
   struct TAGHDR copytag = *taghdr;
+  argon2funmap muchfun = argon2funmaps[copytag.Argon2Type];
+  int aret;
 
+  if (muchfun.f == NULL) {
+    fprintf(stderr, "Argon2 error: unsupported type %u\n", copytag.Argon2Type);
+    return false;
+  }
   /* password and ad are cleared by Argon2 */
-  fprintf(stderr, "Argon2 outlen=%zu passlen=%zu t_cost=%u m_cost=%u nLanes=%u starting...",
-          outlen, passLen, t_cost, m_cost, nLanes);
+  fprintf(stderr, "Argon2%s outlen=%zu passlen=%zu saltlen=%zu t_cost=%u m_cost=%u nLanes=%u starting...",
+          muchfun.name, outlen, passLen, saltlen, t_cost, m_cost, nLanes);
   Argon2_Context ctx(out, outlen, pstr, passLen, salt, saltlen,
                  /* ad */ reinterpret_cast<unsigned char*>(&copytag), sizeof(copytag),
                  /* secret */ NULL, 0,
                  t_cost, m_cost, nLanes, nLanes,
                  NULL, NULL, true, false, true, false);
-  int aret = Argon2d(&ctx);
+  aret = (*muchfun.f)(&ctx);
   delete[] pstr;
   fprintf(stderr, " done\n");
   if (aret != ARGON2_OK) {
@@ -193,6 +212,7 @@ int PWSfileV3::CheckPasskey(const StringX &filename,
     retval = PWScore::NOT_LUMI3_FILE;
     goto err;
   }
+  // hdr.taghdr.Argon2Type check done later
   if (hdr.taghdr.AEAD != V3_AEAD_CHACHA20POLY1305) {
     retval = PWScore::CRYPTO_ERROR;
     goto err;
@@ -272,6 +292,7 @@ int PWSfileV3::WriteHeader()
   uint32 nLanes = nProcs;
 
   memcpy(hdr.taghdr.tag, V3TAG, TAGHDR::V3TAGLEN);
+  hdr.taghdr.Argon2Type = V3_ARGON2_DS; // XXX make configurable
   hdr.taghdr.AEAD = V3_AEAD_CHACHA20POLY1305;
   hdr.taghdr.Hash = V3_HASH_BLAKE2B;
   PWSrand::GetInstance()->GetRandomData(hdr.salt, sizeof(hdr.salt));
