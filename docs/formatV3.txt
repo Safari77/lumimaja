@@ -38,7 +38,7 @@ described here.
 
 2. Format: A V3 format Lumimaja is structured as follows:
 
-    TAG|AEAD|HASH|SALT|HASHPASSES|HASHMEMKIB|HASHLANES|H(P')|ENCSZ|HDR|R1|R2|...|Rn|TAG
+    TAG|ARGON2TYPE|AEAD|HASH|SALT|HASHPASSES|HASHMEMKIB|HASHLANES|H(P')|ENCSZ|HDR|R1|R2|...|Rn|TAG
 
 Where:
 
@@ -46,43 +46,46 @@ Where:
 quick way for the application to identify the database as a Lumimaja
 version 3 file. This tag has no cryptographic value.
 
-2.2 AEAD is one-byte identifier for AEAD used.
+2.2 ARGON2TYPE is one-byte identifier for Argon2 function used (Argon2ds or
+Argon2id)
 
-2.3 HASH is one-byte identifier for hash used.
+2.3 AEAD is one-byte identifier for AEAD used.
 
-2.4 SALT is a 256 bit random value, generated at file creation time.
+2.4 HASH is one-byte identifier for hash used.
 
-2.5 P' is the "stretched key" generated from the user's passphrase and
+2.5 SALT is a 256 bit random value, generated at file creation time.
+
+2.6 P' is the "stretched key" generated from the user's passphrase and
 the SALT, as defined by the hash-function-based key stretching
 algorithm in [ARGON2] (Section 4.1), with Blake2b [BLAKE2B] as the
 hash function, and HASHPASSES passes over the data, HASHMEMKIB
-memory usage, and HASHLANES lanes (threads).  Also TAG, AEAD and HASH
-are included in the KDF function.
+memory usage, and HASHLANES lanes (threads).  Also TAG, ARGON2TYPE,
+AEAD and HASH are included in the KDF function.
 
-2.6 H(P') is BLAKE2B(P')-128, and is used to verify that the user has the
+2.7 H(P') is BLAKE2B(P')-128, and is used to verify that the user has the
 correct passphrase.
 
-2.7 All following records are encrypted using chacha20poly1305 with 64-bit
+2.8 All following records are encrypted using chacha20poly1305 with 64-bit
 nonce. [TLS-CHACHA20POLY1305]
 
-2.8 ENCSZ: 64bit size of the following encrypted data.
+2.9 ENCSZ: 64bit size of the following encrypted data.
 This allows for detection of truncated databases.
 Size is also encrypted using chacha20poly1305, so ENCSZ is 64+128 bits.
 
-2.8.1 HDR: The database header. The header consists of one or more typed
+2.10 HDR: The database header. The header consists of one or more typed
 fields (as defined in section 3.2), beginning with the Version type
 field, and terminated by the 'END' type field. The version number
 and END fields are mandatory. Aside from these two fields, no order is
 assumed on the field types.
 
-2.8.2 R1..Rn: The actual database records. Each record consists of one or
+2.11 R1..Rn: The actual database records. Each record consists of one or
 more typed fields (as defined in Section 3.2), terminated by the 'END' type
 field. The UUID, Title, and Password fields are mandatory. All non-
 mandatory fields may either be absent or have zero length. When a field is
 absent or zero-length, its default value shall be used. Aside from the
 'END' field, no order is assumed on the field types.
 
-2.9 TAG: The 128-bit poly1305 authentication tag (encrypt-then-MAC).
+2.12 TAG: The 128-bit poly1305 authentication tag (encrypt-then-MAC).
 The value is calculated over all of the encrypted fields, that is,
 over all the data stored in all fields (starting from the version number in
 the header, ending with the last field of the last record).
