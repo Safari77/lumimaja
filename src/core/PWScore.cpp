@@ -484,12 +484,11 @@ private:
 int PWScore::WriteFile(const StringX &filename, const bool bUpdateSig,
                        PWSfile::VERSION version)
 {
-  PWS_LOGIT_ARGS("bUpdateSig=%ls", bUpdateSig ? L"true" : L"false");
-
   int status;
   PWSfile *out = PWSfile::MakePWSfile(filename, version,
                                       PWSfile::Write, status);
-  fprintf(stderr, "PWScore::WriteFile PWSfile::MakePWSfile=%d\n", status);
+  fprintf(stderr, "PWScore::WriteFile bUpdateSig=%ls PWSfile::MakePWSfile=%d\n",
+          bUpdateSig ? L"true" : L"false", status);
   if (status != PWSfile::SUCCESS) {
     delete out;
     return status;
@@ -1078,8 +1077,10 @@ bool PWScore::BackupCurFile(int maxNumIncBackups, int backupSuffix,
   if (m_pFileSig != NULL) {
     PWSFileSig curSig(m_currfile.c_str());
     bool passed = (curSig == *m_pFileSig);
-    if (!passed) // XXX yell scream & shout
+    if (!passed) { // XXX yell scream & shout
+      fprintf(stderr, "%ls\n", L"Alert: someone changed Lumimaja database on disk");
       return false;
+    }
   }
 
   pws_os::splitpath(path, drv, dir, name, ext);
@@ -1284,8 +1285,6 @@ void PWScore::EncryptPassword(const unsigned char *plaintext, size_t len,
   if (!pws_os::mcryptUnprotect(m_session_key, sizeof(m_session_key))) {
     pws_os::Trace(_T("pws_os::mcryptUnprotect failed"));
   }
-  fprintf(stderr, "PWScore::EncryptPassword len=%zu pt=%02x%02x%02x%02x\n", len,
-          plaintext[0], plaintext[1], plaintext[2], plaintext[3]);
   crypto_stream_chacha20_xor(ciphertext, plaintext, len, m_session_nonce,
                              m_session_key);
   if (!pws_os::mcryptProtect(m_session_key, sizeof(m_session_key))) {
@@ -1319,8 +1318,8 @@ StringX PWScore::GetPassKey() const
       pws_os::Trace(_T("pws_os::mcryptUnprotect failed"));
     }
     fprintf(stderr, "PWScore::GetPassKey m_passkey_len=%zu\n", m_passkey_len);
-    crypto_stream_chacha20_xor(pt, m_passkey, m_passkey_len, m_session_nonce,
-                                                            m_session_key);
+    crypto_stream_chacha20_xor(pt, m_passkey, m_passkey_len,
+                               m_session_nonce, m_session_key);
     if (!pws_os::mcryptProtect(m_session_key, sizeof(m_session_key))) {
       pws_os::Trace(_T("pws_os::mcryptProtect failed"));
     }

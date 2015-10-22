@@ -2272,6 +2272,9 @@ static void DisplayFileWriteError(int rc, const StringX &fname)
   case PWScore::FAILURE:
     cs_temp = _("Writing Lumimaja database failed!");
     break;
+  case PWScore::CRYPTO_ERROR:
+    cs_temp = _("Corrupt Lumimaja database or unsupported cipher/hash");
+    break;
   default:
     cs_temp = fname.c_str();
     cs_temp += wxT("\n\n");
@@ -2334,7 +2337,8 @@ int PasswordSafeFrame::New()
 
   rc = m_core.WriteCurFile();
   if (rc != PWScore::SUCCESS) {
-    fprintf(stderr, "PasswordSafeFrame::New WriteCurFile() rc=%d\n", rc);
+    fprintf(stderr, "PasswordSafeFrame::New WriteCurFile() rc=%d [%ls]\n",
+            rc, cs_newfile.c_str());
     DisplayFileWriteError(rc, cs_newfile);
     return PWScore::USER_CANCEL;
   }
