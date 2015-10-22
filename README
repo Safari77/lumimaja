@@ -5,7 +5,9 @@ new random IV (TwoFish CBC mode), but all the records are written in one go
 (simplified code a lot).
 
 To install:
-mkdir build && cd build && cmake .. && make -j4
+  mkdir build && cd build && cmake .. && make -j4
+To change compiler:
+  CXX=clang++ CC=clang cmake ..
 
 Yubikey support (ykpers) is autodetected,
   "cmake -D NO_YUBI=1"
