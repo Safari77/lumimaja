@@ -208,6 +208,7 @@ list(APPEND LUMIMAJA_HDRS
     src/ui/wxWidgets/SystemTray.h
     src/ui/wxWidgets/SystemTrayMenuId.h
     src/ui/wxWidgets/safecombinationprompt.h
+    src/ui/wxWidgets/TimedTaskChain.h
     src/core/core_st.h
 )
 
@@ -314,6 +315,7 @@ list(APPEND LUMIMAJA_SRCS
     src/ui/wxWidgets/SafeCombinationCtrl.cpp
     src/ui/wxWidgets/SelectionCriteria.cpp
     src/ui/wxWidgets/SizeRestrictedPanel.cpp
+    src/ui/wxWidgets/TimedTaskChain.cpp
     src/core/core_st.cpp
 )
 
