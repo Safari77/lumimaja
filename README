@@ -4,8 +4,10 @@ Unlike PasswordSafe V3 format, individial records are not written with
 new random IV (TwoFish CBC mode), but all the records are written in one go
 (simplified code a lot).
 
-To install:
-  mkdir build && cd build && cmake .. && make -j4
+To build release version:
+  rm -rf build && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j4
+To build debug version:
+  rm -rf build && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j4
 To change compiler:
   CXX=clang++ CC=clang cmake ..
 
