@@ -31,8 +31,7 @@ void PWSrand::DeleteInstance()
 
 PWSrand::PWSrand()
 {
-  fprintf(stderr, "PWSrand::PWSrand %p test %u\n", this, RangeRand(UINT32_MAX));
-  fprintf(stderr, "PWSrand::PWSrand64 %p test %" PRIu64 "\n", this, RangeRand64(UINT64_MAX));
+  (void)RangeRand64(UINT64_MAX);
 }
 
 PWSrand::~PWSrand()
