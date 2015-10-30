@@ -28,6 +28,15 @@
 #include <iostream> // currently for debugging
 #include <sodium.h>
 
+#ifdef HAVE_PR_SET_DUMPABLE
+#include <sys/prctl.h>
+#endif
+
+#ifdef HAVE_PT_DENY_ATTACH
+#include <sys/types.h>
+#include <sys/ptrace.h>
+#endif
+
 using namespace std;
 
 #include "pwsafeapp.h"
@@ -297,6 +306,22 @@ bool PwsafeApp::OnInit()
     return false;
 
   sodium_init();
+
+#if defined(HAVE_PR_SET_DUMPABLE)
+  // prevent ptrace and creation of core dumps
+  if (prctl(PR_SET_DUMPABLE, 0) != 0) {
+    std::wcerr << L"prctl failed." << std::endl;
+    return false;
+  }
+#endif
+
+#ifdef HAVE_PT_DENY_ATTACH
+  if (ptrace(PT_DENY_ATTACH, 0, 0, 0) != 0) {
+    std::wcerr << L"ptrace(PT_DENY_ATTACH, ...) failed." << std::endl;
+    return false;
+  }
+#endif
+
   // Parse command line options:
   wxString filename, user, host, cfg_file;
   bool cmd_ro = cmdParser.Found(wxT("r"));

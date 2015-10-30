@@ -72,15 +72,47 @@ int main(int argc, char *argv[])
   return 0;
 }
 " HAVE_ARGON2_H)
-# FAIL_REGEX is for output _during_ compiling :(
+
+CHECK_CXX_SOURCE_COMPILES("
+#include <sys/prctl.h>
+int main() { prctl(PR_SET_DUMPABLE, 0); return 0; }
+" HAVE_PR_SET_DUMPABLE)
+
+if(APPLE)
+CHECK_CXX_SOURCE_COMPILES("
+#include <sys/types.h>
+#include <sys/ptrace.h>
+int main() { ptrace(PT_DENY_ATTACH, 0, 0, 0); return 0; }
+" HAVE_PT_DENY_ATTACH)
+endif()
 
 if(NOT HAVE_ARGON2_H)
-  message( FATAL_ERROR "Please install Argon2 from https://github.com/khovratovich/Argon2.git , directory Source/C++11" )
+  message(FATAL_ERROR "Please install Argon2 from https://github.com/khovratovich/Argon2.git , directory Source/C++11" )
 endif(NOT HAVE_ARGON2_H)
 
 if(NOT HAVE_SODIUM_H)
-  message( FATAL_ERROR "Please install libsodium from https://github.com/jedisct1/libsodium" )
+  message(FATAL_ERROR "Please install libsodium from https://github.com/jedisct1/libsodium" )
 endif(NOT HAVE_SODIUM_H)
+
+if( NOT CMAKE_BUILD_TYPE )
+  set( CMAKE_BUILD_TYPE Release )
+endif( NOT CMAKE_BUILD_TYPE )
+
+if(CMAKE_BUILD_TYPE STREQUAL Release)
+  message(STATUS "Possibly disabling ptrace from built binary")
+
+  if(HAVE_PR_SET_DUMPABLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_PR_SET_DUMPABLE")
+  endif()
+
+  if(HAVE_PT_DENY_ATTACH)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DHAVE_PT_DENY_ATTACH")
+  endif()
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  message(STATUS "ptrace and core dumps allowed from built binary")
+endif()
 
 if(HAVE_YKPERS_H)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/include/ykpers-1")
