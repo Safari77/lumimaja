@@ -65,8 +65,8 @@ void ExternalKeyboardButton::HandleCommandEvent(wxCommandEvent& evt)
   GdkWindow* window = widget->window;
   int xwinid = GDK_WINDOW_XWINDOW(window);
 #endif
-  wxString command = wxString(wxT("xvkbd"));
-  
+  wxString command = wxString(wxT("xvkbd -no-sync -no-repeat -compact -secure"));
+
   switch(wxExecute(command, wxEXEC_ASYNC, NULL)) //NULL => we don't want a wxProcess as callback
   {
     case 0:
