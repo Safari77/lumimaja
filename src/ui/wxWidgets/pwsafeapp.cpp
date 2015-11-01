@@ -326,8 +326,6 @@ bool PwsafeApp::OnInit()
   wxString filename, user, host, cfg_file;
   bool cmd_ro = cmdParser.Found(wxT("r"));
   // Next variable currently not referenced
-  bool cmd_encrypt = cmdParser.Found(wxT("e"), &filename);
-  bool cmd_decrypt = cmdParser.Found(wxT("d"), &filename);
   bool cmd_closed = cmdParser.Found(wxT("c"));
   bool cmd_silent = cmdParser.Found(wxT("s"));
   bool cmd_minimized = cmdParser.Found(wxT("m"));
@@ -345,8 +343,7 @@ bool PwsafeApp::OnInit()
     return false;
   }
   // check for mutually exclusive options
-  if (((cmd_encrypt + cmd_decrypt) > 1) ||
-      ((cmd_closed + cmd_silent + cmd_minimized) > 1)) {
+  if ((cmd_closed + cmd_silent + cmd_minimized) > 1) {
     cmdParser.Usage();
     return false;
   }
