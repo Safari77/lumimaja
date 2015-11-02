@@ -57,7 +57,7 @@ Argon2id)
 
 2.6 P' is the "stretched key" generated from the user's passphrase and
 the SALT, as defined by the hash-function-based key stretching
-algorithm in [ARGON2] (Section 4.1), with Blake2b [BLAKE2B] as the
+algorithm in [ARGON2] (Section 4.1), with Blake2b [BLAKE2] as the
 hash function, and HASHPASSES passes over the data, HASHMEMKIB
 memory usage, and HASHLANES lanes (threads).  Also TAG, ARGON2TYPE,
 AEAD and HASH are included in the KDF function.
@@ -510,7 +510,8 @@ implementations of this format specification in the interest of
 interoperablity.
 
 5. References:
-[BLAKE2B] https://blake2.net/blake2.pdf
+[BLAKE2] https://blake2.net/blake2.pdf
+         https://www.rfc-editor.org/authors/rfc7693.txt
 [ARGON2] https://www.cryptolux.org/images/0/0d/Argon2.pdf
 [TLS-CHACHA20POLY1305] https://tools.ietf.org/html/draft-agl-tls-chacha20poly1305-04
 
