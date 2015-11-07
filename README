@@ -11,6 +11,9 @@ To build debug version:
 To change compiler:
   CXX=clang++ CC=clang cmake ..
 
+Check if release binary is hardened as expected:
+  hardening-check build/lumimaja
+
 Yubikey support (ykpers) is autodetected,
   "cmake -D NO_YUBI=1"
 to disable it.
