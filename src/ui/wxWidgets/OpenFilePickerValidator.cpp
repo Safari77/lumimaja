@@ -24,6 +24,7 @@ bool COpenFilePickerValidator::TransferFromWindow() {
   if (GetWindow() && GetWindow()->IsKindOf(&wxFilePickerCtrl::ms_classInfo)) {
     wxFilePickerCtrl* ctrl = dynamic_cast<wxFilePickerCtrl *>(GetWindow());
     wxASSERT(ctrl);
+    if (!ctrl) return false;
     m_str = ctrl->GetPath();
     return true;
   }
@@ -34,6 +35,7 @@ bool COpenFilePickerValidator::TransferToWindow() {
   if (GetWindow() && GetWindow()->IsKindOf(&wxFilePickerCtrl::ms_classInfo)) {
     wxFilePickerCtrl* ctrl = dynamic_cast<wxFilePickerCtrl *>(GetWindow());
     wxASSERT(ctrl);
+    if (!ctrl) return false;
     ctrl->SetPath(m_str);
     return true;
   }
@@ -44,6 +46,7 @@ bool COpenFilePickerValidator::Validate(wxWindow * parent) {
   if (GetWindow() && GetWindow()->IsKindOf(&wxFilePickerCtrl::ms_classInfo)) {
     wxFilePickerCtrl* ctrl = dynamic_cast<wxFilePickerCtrl *>(GetWindow());
     wxASSERT(ctrl);
+    if (!ctrl) return false;
     wxString path = ctrl->GetPath();
     if (path.IsEmpty()) {
       wxMessageBox(wxString() << _("You must select a valid file to continue.") << wxT("\n\n") << path,

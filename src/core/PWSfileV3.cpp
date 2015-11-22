@@ -587,9 +587,11 @@ int PWSfileV3::ReadHeader()
         if (utf8 != NULL) utf8[utf8Len] = '\0';
         StringX pref;
         utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, pref);
-        m_hdr.m_prefString = pref;
-        if (!utf8status)
+        if (utf8status) {
+          m_hdr.m_prefString = pref;
+        } else {
           pws_os::Trace0(_T("FromUTF8(m_prefString) failed\n"));
+        }
       } else
         m_hdr.m_prefString = _T("");
       break;
@@ -597,12 +599,14 @@ int PWSfileV3::ReadHeader()
     case HDR_DISPSTAT: /* Tree Display Status */
       if (utf8 != NULL) utf8[utf8Len] = '\0';
       utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      for (StringX::iterator iter = text.begin(); iter != text.end(); iter++) {
-        const TCHAR v = *iter;
-        m_hdr.m_displaystatus.push_back(v == TCHAR('1'));
-      }
-      if (!utf8status)
+      if (utf8status) {
+        for (StringX::iterator iter = text.begin(); iter != text.end(); iter++) {
+          const TCHAR v = *iter;
+          m_hdr.m_displaystatus.push_back(v == TCHAR('1'));
+        }
+      } else {
         pws_os::Trace0(_T("FromUTF8(m_displaystatus) failed\n"));
+      }
       break;
 
     case HDR_LASTUPDATETIME: /* When last saved */
@@ -616,34 +620,29 @@ int PWSfileV3::ReadHeader()
 
     case HDR_LASTUPDATEAPPLICATION: /* and by what */
       if (utf8 != NULL) utf8[utf8Len] = '\0';
-      utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      m_hdr.m_whatlastsaved = text;
+      utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, m_hdr.m_whatlastsaved);
       if (!utf8status)
         pws_os::Trace0(_T("FromUTF8(m_whatlastsaved) failed\n"));
       break;
 
     case HDR_LASTUPDATEUSER:
       if (utf8 != NULL) utf8[utf8Len] = '\0';
-      utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      m_hdr.m_lastsavedby = text;
+      m_utf8conv.FromUTF8(utf8, utf8Len, m_hdr.m_lastsavedby);
       break;
 
     case HDR_LASTUPDATEHOST:
       if (utf8 != NULL) utf8[utf8Len] = '\0';
-      utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      m_hdr.m_lastsavedon = text;
+      m_utf8conv.FromUTF8(utf8, utf8Len, m_hdr.m_lastsavedon);
       break;
 
     case HDR_DBNAME:
       if (utf8 != NULL) utf8[utf8Len] = '\0';
-      utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      m_hdr.m_dbname = text;
+      m_utf8conv.FromUTF8(utf8, utf8Len, m_hdr.m_dbname);
       break;
 
     case HDR_DBDESC:
       if (utf8 != NULL) utf8[utf8Len] = '\0';
-      utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      m_hdr.m_dbdesc = text;
+      m_utf8conv.FromUTF8(utf8, utf8Len, m_hdr.m_dbdesc);
       break;
 
 #if !defined(USE_XML_LIBRARY) || (!defined(_WIN32) && USE_XML_LIBRARY == MSXML)
@@ -654,7 +653,7 @@ int PWSfileV3::ReadHeader()
     case HDR_FILTERS:
       if (utf8 != NULL) utf8[utf8Len] = '\0';
       utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-      if (utf8Len > 0) {
+      if (utf8status && (utf8Len > 0)) {
         stringT strErrors;
         stringT XSDFilename = PWSdirs::GetXMLDir() + _T("lumimaja_filter.xsd");
         if (!pws_os::FileExists(XSDFilename)) {

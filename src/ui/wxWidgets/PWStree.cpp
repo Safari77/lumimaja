@@ -607,6 +607,7 @@ void PWSTreeCtrl::OnDBGUIPrefsChange(wxEvent& evt)
   UNREFERENCED_PARAMETER(evt);
   PasswordSafeFrame *pwsframe = dynamic_cast<PasswordSafeFrame *>(GetParent());
   wxASSERT(pwsframe != NULL);
+  if (!pwsframe) return;
   if (pwsframe->IsTreeView())
     pwsframe->RefreshViews();
 }

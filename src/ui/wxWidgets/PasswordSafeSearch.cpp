@@ -389,6 +389,7 @@ void PasswordSafeSearch::CreateSearchBar()
 
   wxSizer* origSizer = m_parentFrame->GetSizer();
   wxASSERT(origSizer);
+  if (!origSizer) return;
   wxASSERT(origSizer->IsKindOf(wxBoxSizer(wxVERTICAL).GetClassInfo()));
   wxASSERT(((wxBoxSizer*)origSizer)->GetOrientation() == wxVERTICAL);
   origSizer->Add(panel, 0, wxEXPAND | wxALIGN_CENTER);

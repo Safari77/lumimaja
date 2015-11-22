@@ -305,7 +305,10 @@ bool PwsafeApp::OnInit()
   if (res != 0)
     return false;
 
-  sodium_init();
+  if (sodium_init() != 0) {
+    std::wcerr << L"sodium_init failed." << std::endl;
+    return false;
+  }
 
 #if defined(HAVE_PR_SET_DUMPABLE)
   // prevent ptrace and creation of core dumps

@@ -28,6 +28,7 @@ CViewReport::CViewReport(wxWindow* parent, CReport* pRpt) :
                       wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER),  m_pRpt(pRpt)
 {
   wxASSERT(pRpt);
+  if (!pRpt) return;
 
   wxBoxSizer* dlgSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -38,6 +39,7 @@ CViewReport::CViewReport(wxWindow* parent, CReport* pRpt) :
   wxStdDialogButtonSizer* bs = CreateStdDialogButtonSizer(0);
 
   wxASSERT_MSG(bs, wxT("Could not create an empty wxStdDlgButtonSizer"));
+  if (!bs) return;
 
   bs->Add(new wxButton(this, wxID_SAVE, _("&Save to Disk")));
   bs->AddSpacer(ColSeparation);

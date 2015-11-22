@@ -108,7 +108,7 @@ int CItemData::Read(PWSfile *in)
 
     if (utf8 != NULL) {
       trashMemory(utf8, utf8Len * sizeof(utf8[0]));
-      delete[] utf8; utf8 = NULL; utf8Len = 0;
+      delete[] utf8; utf8 = NULL;
     }
   } while (type != END && fieldLen > 0 && --emergencyExit > 0);
 
