@@ -9,7 +9,9 @@ To build release version:
 To build debug version:
   rm -rf build && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug .. && make -j4
 To change compiler:
-  CXX=clang++ CC=clang cmake ..
+  cmake -DCMAKE_C_COMPILER=/usr/libexec/clang-analyzer/scan-build/ccc-analyzer \
+        -DCMAKE_CXX_COMPILER=/usr/libexec/clang-analyzer/scan-build/c++-analyzer
+  To use clang-analyzer, also do "scan-build make -j4" instead of "make -j4".
 
 Check if release binary is hardened as expected:
   hardening-check build/lumimaja
