@@ -43,33 +43,20 @@
 #define __PWSPLATFORM_H
 
 #if (defined(_WIN32) || defined (_WIN64))
-// Make sure Windows.h does not define min & max macros
-#define NOMINMAX
+#  error Windows build not supported
 #endif
 
-#if (defined(_WIN32) || defined (_WIN64)) && !defined(__WX__)
-// ONLY place in core which refers to parent. Ugh.
-#include "../ui/Windows/stdafx.h"
-#else
-// some globally useful includes for non-Windows
 #include <cassert>
-#endif
-
-#ifndef _MSC_VER
 #include <stdint.h>
+
+typedef uint64_t ulong64;
+
+#if defined(__linux__) || defined(__unix__)
+#include <endian.h>
 #endif
 
 #undef PWS_PLATFORM
 #undef POCKET_PC
-
-#if defined(_WIN32)
-#ifdef BIG_ENDIAN
-#define PWS_BIG_ENDIAN
-#endif
-#ifdef LITTLE_ENDIAN
-#define PWS_LITTLE_ENDIAN
-#endif
-#endif
 
 // PWS_BIG_ENDIAN and PWS_LITTLE_ENDIAN can be specified on the
 #if defined(PWS_BIG_ENDIAN)
@@ -83,54 +70,39 @@
 #endif
 
 // **********************************************
-// * Windows 32                                 *
+// * Linux                                      *
 // **********************************************
-#if defined(_WIN32)
-#if defined(x86) || defined(_x86) || defined(_X86) || defined(_X86_) || defined(_M_IX86) || defined(_M_X64)
-#define PWS_PLATFORM "Windows"
-#define PWS_LITTLE_ENDIAN
+#if defined(__linux__)
+#  define PWS_PLATFORM "Linux"
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#  define PWS_LITTLE_ENDIAN
+#else
+#  define PWS_BIG_ENDIAN
 #endif
-// **********************************************
-// * Linux on Intel                             *
-// **********************************************
-#elif defined(__linux)
-#define PWS_PLATFORM "Linux"
-#if defined(__i386__) || defined(__i486__) || defined(__x86_64__)
-#define PWS_LITTLE_ENDIAN
-#endif
-// **********************************************
-// * cygwin on Intel                             *
-// **********************************************
-#elif defined(__CYGWIN__)
-#define PWS_PLATFORM "Cygwin"
-#if defined(__i386__) || defined(__i486__)
-#define PWS_LITTLE_ENDIAN
-#endif
+
 /* http://predef.sourceforge.net/preos.html*/
 #elif defined (macintosh) || defined(Macintosh) || defined(__APPLE__) || defined(__MACH__)
-#define PWS_PLATFORM "Mac"
-#define __PWS_MACINTOSH__
-/* following line was added to avoid "Impossible constraint in 'asm'" errors in ROLc()
-   and RORc() functions below, just like it is defined for Linux and cygwin above */
-#if defined(__APPLE__) && defined(__MACH__)
-#define PWS_PLATFORM_EX MacOSX
-#else
-#define PWS_PLATFORM_EX MacOS9
-#endif
+#  define PWS_PLATFORM "Mac"
+#  define __PWS_MACINTOSH__
+#  if defined(__APPLE__) && defined(__MACH__)
+#    define PWS_PLATFORM_EX MacOSX
+#  else
+#    define PWS_PLATFORM_EX MacOS9
+#  endif
 /* gcc shipped with snow leopard defines this.  Try "cpp -dM dummy.h"*/
-#if defined (__LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 1)
-#define PWS_LITTLE_ENDIAN
-#else
-#define PWS_BIG_ENDIAN
-#endif
+#  if defined (__LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 1)
+#    define PWS_LITTLE_ENDIAN
+#  else
+#    define PWS_BIG_ENDIAN
+#  endif
 // **********************************************
 // * FreeBSD on Intel                           *
 // **********************************************
 #elif defined(__FreeBSD) || defined(__FreeBSD__)
-#define PWS_PLATFORM "FreeBSD"
-#if defined(__i386__) || defined(__amd64__)
-#define PWS_LITTLE_ENDIAN
-#endif
+#  define PWS_PLATFORM "FreeBSD"
+#  if defined(__i386__) || defined(__amd64__)
+#    define PWS_LITTLE_ENDIAN
+#  endif
 // **********************************************
 // * Add other platforms here...                *
 // **********************************************
@@ -149,19 +121,8 @@
 #error Both PWS_BIG_ENDIAN and PWS_LITTLE_ENDIAN are defined, only one should be defined.
 #endif
 
-/* fix for MSVC ...evil! */
-#ifdef _MSC_VER
-#define CONST64(n) n ## ui64
-typedef unsigned __int64 ulong64;
-#else
-#define CONST64(n) n ## ULL
-typedef uint64_t ulong64;
-#endif
-
 #define NumberOf(array) ((sizeof array) / sizeof(array[0]))
 
-#if !defined(_MFC_VER) && !defined(_WIN32)
 #define UNREFERENCED_PARAMETER(P) (void)(P)
-#endif
 
 #endif /* __PWSPLATFORM_H */
