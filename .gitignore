@@ -4,4 +4,6 @@ ID
 tags
 build
 /src/ui/wxWidgets/I18N/lumimaja.pot
+*.rej
+*.orig
 
