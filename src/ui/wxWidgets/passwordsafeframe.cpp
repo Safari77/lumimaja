@@ -210,6 +210,8 @@ BEGIN_EVENT_TABLE( PasswordSafeFrame, wxFrame )
   EVT_MENU(ID_BACKUP,      PasswordSafeFrame::OnBackupSafe)
   EVT_MENU(ID_RESTORE,     PasswordSafeFrame::OnRestoreSafe)
 
+  EVT_MENU(ID_VISITWEBSITE, PasswordSafeFrame::OnVisitWebsite)
+
   EVT_ICONIZE(PasswordSafeFrame::OnIconize)
 
   EVT_UPDATE_UI(wxID_SAVE,          PasswordSafeFrame::OnUpdateUI )
@@ -506,7 +508,7 @@ void PasswordSafeFrame::CreateMenubar()
   menuBar->Append(itemMenu72, _("&Manage"));
   wxMenu* itemMenu79 = new wxMenu;
   itemMenu79->Append(wxID_HELP);
-  itemMenu79->Append(ID_MENUITEM, _("Visit Lumimaja &website..."), _T(""), wxITEM_NORMAL);
+  itemMenu79->Append(ID_VISITWEBSITE, _("Visit Lumimaja &website..."), _T(""), wxITEM_NORMAL);
   itemMenu79->Append(wxID_ABOUT);
   menuBar->Append(itemMenu79, _("&Help"));
 ////@end PasswordSafeFrame content construction
@@ -537,7 +539,7 @@ void PasswordSafeFrame::CreateControls()
 
   wxBoxSizer* mainsizer = new wxBoxSizer(wxVERTICAL); //to add the search bar later to the bottom
   wxBoxSizer* itemBoxSizer83 = new wxBoxSizer(wxHORIZONTAL);
-  mainsizer->Add(itemBoxSizer83, 1, wxEXPAND | wxALIGN_CENTER);
+  mainsizer->Add(itemBoxSizer83, 1, wxEXPAND);
   SetSizer(mainsizer);
 
   m_grid = new PWSGrid( this, m_core, ID_LISTBOX, wxDefaultPosition,
@@ -2622,6 +2624,16 @@ void PasswordSafeFrame::SetTrayStatus(bool locked)
   m_sysTray->SetTrayStatus(locked ? SystemTray::TRAY_LOCKED : SystemTray::TRAY_UNLOCKED);
 }
 
+void PasswordSafeFrame::SetTrayClosed()
+{
+  m_sysTray->SetTrayStatus(SystemTray::TRAY_CLOSED);
+}
+
+void PasswordSafeFrame::ShowTrayIcon()
+{
+  if (m_sysTray)
+    m_sysTray->ShowIcon();
+}
 
 void PasswordSafeFrame::OnOpenRecentDB(wxCommandEvent& evt)
 {
@@ -3328,6 +3340,11 @@ void PasswordSafeFrame::OnCompare(wxCommandEvent& /*evt*/)
 {
   CompareDlg dlg(this, &m_core);
   dlg.ShowModal();
+}
+
+void PasswordSafeFrame::OnVisitWebsite(wxCommandEvent&)
+{
+  wxLaunchDefaultBrowser("https://samifar.in");
 }
 
 //-----------------------------------------------------------------

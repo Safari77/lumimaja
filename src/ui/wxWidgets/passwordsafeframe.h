@@ -99,7 +99,7 @@ class PasswordSafeSearch;
 #define ID_PWDPOLSM 10215
 #define ID_YUBIKEY_MNG 10010
 #define ID_LANGUAGEMENU 10011
-#define ID_MENUITEM 10012
+#define ID_VISITWEBSITE 10012
 #define SYMBOL_PASSWORDSAFEFRAME_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxMINIMIZE_BOX|wxMAXIMIZE_BOX|wxCLOSE_BOX
 #define SYMBOL_PASSWORDSAFEFRAME_TITLE _("Lumimaja")
 #define SYMBOL_PASSWORDSAFEFRAME_IDNAME ID_PASSWORDSAFEFRAME
@@ -373,6 +373,8 @@ public:
   void OnBackupSafe(wxCommandEvent& evt);
   void OnRestoreSafe(wxCommandEvent& evt);
 
+  void OnVisitWebsite(wxCommandEvent&);
+
 ////@begin PasswordSafeFrame member function declarations
 
   /// Retrieves bitmap resources
@@ -434,6 +436,8 @@ public:
   wxString GetCurrentSafe() const { return towxstring(m_core.GetCurFile()); }
 
   void SetTrayStatus(bool locked);
+  void SetTrayClosed();
+  void ShowTrayIcon();
 
   ////@begin PasswordSafeFrame member variables
   PWSGrid* m_grid;
