@@ -19,6 +19,7 @@
 #include "core.h"
 #include "PWSfile.h"
 #include "PWScore.h"
+#include "PWStime.h"
 
 #include "os/typedefs.h"
 #include "os/pws_tchar.h"
@@ -183,36 +184,43 @@ int CItemData::Write(PWSfile *out) const
   for (i = 0; TextFields[i] != END; i++)
     WriteIfSet(TextFields[i], out, true);
 
-  int32 i32;
-  
   for (i = 0; TimeFields[i] != END; i++) {
     time_t t = 0;
     GetTime(TimeFields[i], t);
     if (t != 0) {
-      i32 = static_cast<int32>(t);
-      out->WriteRaw(static_cast<unsigned char>(TimeFields[i]),
-                      reinterpret_cast<unsigned char *>(&i32), sizeof(i32));
+      PWStime pwt(t);
+      out->WriteRaw(static_cast<unsigned char>(TimeFields[i]), pwt, PWStime::TIME_LEN);
     }
   }
 
+  int32 i32 = 0;
+  unsigned char buf32[sizeof(i32)];
   GetXTimeInt(i32);
   if (i32 > 0 && i32 <= 3650) {
-    out->WriteRaw(XTIME_INT, reinterpret_cast<unsigned char *>(&i32), sizeof(i32));
+    putInt32(buf32, i32);
+    out->WriteRaw(XTIME_INT, buf32, sizeof(buf32));
   }
 
+  i32 = 0;
   GetKBShortcut(i32);
   if (i32 != 0) {
-    out->WriteRaw(KBSHORTCUT, reinterpret_cast<unsigned char *>(&i32),
-                    sizeof(i32));
+    putInt32(buf32, i32);
+    out->WriteRaw(KBSHORTCUT, buf32, sizeof(buf32));
   }
 
-  int16 i16;
+  int16 i16 = 0;
+  unsigned char buf16[sizeof(i16)];
   GetDCA(i16);
-  if (i16 >= PWSprefs::minDCA && i16 <= PWSprefs::maxDCA)
-    out->WriteRaw(DCA, reinterpret_cast<unsigned char *>(&i16), sizeof(i16));
+  if (i16 >= PWSprefs::minDCA && i16 <= PWSprefs::maxDCA) {
+    putInt16(buf16, i16);
+    out->WriteRaw(DCA, buf16, sizeof(buf16));
+  }
+  i16 = 0;
   GetShiftDCA(i16);
-  if (i16 >= PWSprefs::minDCA && i16 <= PWSprefs::maxDCA)
-    out->WriteRaw(SHIFTDCA, reinterpret_cast<unsigned char *>(&i16), sizeof(i16));
+  if (i16 >= PWSprefs::minDCA && i16 <= PWSprefs::maxDCA) {
+    putInt16(buf16, i16);
+    out->WriteRaw(SHIFTDCA, buf16, sizeof(buf16));
+  }
 
   WriteIfSet(PROTECTED, out, false);
 
@@ -381,10 +389,10 @@ void CItemData::GetTime(int whichtime, time_t &t) const
     GetField(fiter->second, in, tlen);
 
     if (tlen != 0) {
-      int32 t32;
-      ASSERT(tlen == sizeof(t32));
-      memcpy(&t32, in, sizeof(t32));
-      t = t32;
+      int64 t64;
+      ASSERT(tlen == sizeof(t64));
+      memcpy(&t64, in, sizeof(t64));
+      t = t64;
     } else {
       t = 0;
     }
@@ -422,7 +430,7 @@ void CItemData::GetPWPolicy(PWPolicy &pwp) const
   pwp = mypol;
 }
 
-void CItemData::GetXTimeInt(int32 &xint) const
+int32 CItemData::GetXTimeInt(int32 &xint) const
 {
   FieldConstIter fiter = m_fields.find(XTIME_INT);
   if (fiter == m_fields.end())
@@ -439,6 +447,7 @@ void CItemData::GetXTimeInt(int32 &xint) const
       xint = 0;
     }
   }
+  return xint;
 }
 
 StringX CItemData::GetXTimeInt() const
@@ -486,7 +495,7 @@ bool CItemData::IsProtected() const
   return ucprotected != 0;
 }
 
-void CItemData::GetDCA(int16 &iDCA, const bool bShift) const
+int16 CItemData::GetDCA(int16 &iDCA, const bool bShift) const
 {
   FieldConstIter fiter = m_fields.find(bShift ? SHIFTDCA : DCA);
   if (fiter != m_fields.end()) {
@@ -500,8 +509,10 @@ void CItemData::GetDCA(int16 &iDCA, const bool bShift) const
     } else {
       iDCA = -1;
     }
-  } else // fiter == m_fields.end()
+  } else { // fiter == m_fields.end()
     iDCA = -1;
+  }
+  return iDCA;
 }
 
 StringX CItemData::GetDCA(const bool bShift) const
@@ -513,7 +524,7 @@ StringX CItemData::GetDCA(const bool bShift) const
   return os.str();
 }
 
-void CItemData::GetKBShortcut(int32 &iKBShortcut) const
+int32 CItemData::GetKBShortcut(int32 &iKBShortcut) const
 {
   FieldConstIter fiter = m_fields.find(KBSHORTCUT);
   if (fiter != m_fields.end()) {
@@ -527,8 +538,10 @@ void CItemData::GetKBShortcut(int32 &iKBShortcut) const
     } else {
       iKBShortcut = 0;
     }
-  } else // fiter == m_fields.end()
+  } else { // fiter == m_fields.end()
     iKBShortcut = 0;
+  }
+  return iKBShortcut;
 }
 
 StringX CItemData::GetKBShortcut() const
@@ -1245,28 +1258,27 @@ void CItemData::SetAutoType(const StringX &autotype)
 
 void CItemData::SetTime(int whichtime)
 {
-  time_t t;
-  time(&t);
+  int64 t = time(NULL);
   SetTime(whichtime, t);
 }
 
-void CItemData::SetTime(int whichtime, time_t t)
+void CItemData::SetTime(int whichtime, int64 t)
 {
-  int t32 = static_cast<int32>(t);
-  SetField(static_cast<FieldType>(whichtime),
-           reinterpret_cast<const unsigned char *>(&t32), sizeof(t32));
+  unsigned char buf[sizeof(int64)] = {0};
+  putInt64(buf, t);
+  SetField(static_cast<FieldType>(whichtime), buf, sizeof(buf));
 }
 
 bool CItemData::SetTime(int whichtime, const stringT &time_str)
 {
-  time_t t(0);
+  int64 t(0);
 
   if (time_str.empty()) {
     SetTime(whichtime, t);
     return true;
   } else
     if (time_str == _T("now")) {
-      time(&t);
+      t = time(NULL);
       SetTime(whichtime, t);
       return true;
     } else
@@ -1283,8 +1295,9 @@ bool CItemData::SetTime(int whichtime, const stringT &time_str)
 
 void CItemData::SetXTimeInt(int32 &xint)
 {
-   SetField(XTIME_INT, reinterpret_cast<const unsigned char *>(&xint),
-            sizeof(int32));
+   unsigned char buf[sizeof(int32)];
+   putInt32(buf, xint);
+   SetField(XTIME_INT, buf, sizeof(buf));
 }
 
 bool CItemData::SetXTimeInt(const stringT &xint_str)
@@ -1379,10 +1392,11 @@ void CItemData::SetPolicyName(const StringX &sx_PolicyName)
   SetField(POLICYNAME, sx_PolicyName);
 }
 
-void CItemData::SetDCA(const int16 &iDCA, const bool bShift)
+void CItemData::SetDCA(int16 &iDCA, const bool bShift)
 {
-   SetField(bShift ? SHIFTDCA : DCA,
-            reinterpret_cast<const unsigned char *>(&iDCA), sizeof(int16));
+   unsigned char buf[sizeof(int16)];
+   putInt16(buf, iDCA);
+   SetField(bShift ? SHIFTDCA : DCA, buf, sizeof(buf));
 }
 
 bool CItemData::SetDCA(const stringT &cs_DCA, const bool bShift)
@@ -1417,10 +1431,11 @@ void CItemData::SetProtected(bool bOnOff)
   }
 }
 
-void CItemData::SetKBShortcut(const int32 &iKBShortcut)
+void CItemData::SetKBShortcut(int32 iKBShortcut)
 {
-  SetField(KBSHORTCUT, reinterpret_cast<const unsigned char *>(&iKBShortcut),
-           sizeof(int32));
+  unsigned char buf[sizeof(int32)];
+  putInt32(buf, iKBShortcut);
+  SetField(KBSHORTCUT, buf, sizeof(buf));
 }
 
 void CItemData::SetKBShortcut(const StringX &sx_KBShortcut)
@@ -1780,29 +1795,13 @@ static bool pull_string(StringX &str, const unsigned char *data, size_t len)
   return utf8status;
 }
 
-static bool pull_time32(time_t &t, const unsigned char *data, size_t len)
+static bool pull_int64(int64 &i, const unsigned char *data, size_t len)
 {
-  if (len == sizeof(__time32_t)) {
-    t = *reinterpret_cast<const time_t *>(data);
-  } else if (len == sizeof(__time64_t)) {
-    // convert from 64 bit time to currently supported 32 bit
-    struct tm ts;
-    const __time64_t *t64 = reinterpret_cast<const __time64_t *>(data);
-    if (_gmtime64_s(&ts, t64) != 0) {
-      ASSERT(0); return false;
-    }
-    t = _mkgmtime32(&ts);
-    if (t == time_t(-1)) { // time is past 2038!
-      t = 0; return false;
-    }
-#if (!defined(WIN64) && !defined(_WIN64)) /* ugly, but necessary */
-  } else if (len < sizeof(__time32_t)) {
-    // Turns out that __time32_t is 64bits under 64bits...
-    uint32 t32 = *reinterpret_cast<const uint32 *>(data);
-    t = t32;
-#endif
+  if (len == sizeof(int64)) {
+    i = *reinterpret_cast<const int64 *>(data);
   } else {
-    ASSERT(0); return false;
+    ASSERT(0);
+    return false;
   }
   return true;
 }
@@ -1873,7 +1872,7 @@ bool CItemData::DeSerializePlainText(const std::vector<char> &v)
 bool CItemData::SetField(int type, const unsigned char *data, size_t len)
 {
   StringX str;
-  time_t t;
+  int64 t64;
   int32 i32;
   int16 i16;
   unsigned char uc;
@@ -1913,8 +1912,8 @@ bool CItemData::SetField(int type, const unsigned char *data, size_t len)
     case ATIME:
     case XTIME:
     case RMTIME:
-      if (!pull_time32(t, data, len)) return false;
-      SetTime(ft, t);
+      if (!pull_int64(t64, data, len)) return false;
+      SetTime(ft, t64);
       break;
     case XTIME_INT:
       if (!pull_int32(i32, data, len)) return false;
@@ -1971,14 +1970,13 @@ static void push_string(vector<char> &v, char type,
   }
 }
 
-static void push_time(vector<char> &v, char type, time_t t)
+static void push_time(vector<char> &v, char type, int64 t)
 {
   if (t != 0) {
-   time_t t32 = static_cast<time_t>(t);
     v.push_back(type);
-    push_length(v, sizeof(t32));
+    push_length(v, sizeof(t));
     v.insert(v.end(),
-      reinterpret_cast<char *>(&t32), reinterpret_cast<char *>(&t32) + sizeof(t32));
+      reinterpret_cast<char *>(&t), reinterpret_cast<char *>(&t) + sizeof(t));
   }
 }
 

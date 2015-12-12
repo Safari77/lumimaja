@@ -182,15 +182,15 @@ public:
   void GetXTime(time_t &t) const {GetTime(XTIME, t);}  // V30
   void GetPMTime(time_t &t) const {GetTime(PMTIME, t);}  // V30
   void GetRMTime(time_t &t) const {GetTime(RMTIME, t);}  // V30
-  void GetXTimeInt(int32 &xint) const; // V30
+  int32 GetXTimeInt(int32 &xint) const; // V30
   StringX GetXTimeInt() const; // V30
   StringX GetPWHistory() const;  // V30
   void GetPWPolicy(PWPolicy &pwp) const;
   StringX GetPWPolicy() const {return GetField(POLICY);}
   StringX GetRunCommand() const {return GetField(RUNCMD);}
-  void GetDCA(int16 &iDCA, const bool bShift = false) const;
+  int16 GetDCA(int16 &iDCA, const bool bShift = false) const;
   StringX GetDCA(const bool bShift = false) const;
-  void GetShiftDCA(int16 &iDCA) const { GetDCA(iDCA, true); }
+  int16 GetShiftDCA(int16 &iDCA) const { return GetDCA(iDCA, true); }
   StringX GetShiftDCA() const {return GetDCA(true);}
   StringX GetEmail() const {return GetField(EMAIL);}
   StringX GetProtected() const;
@@ -198,7 +198,7 @@ public:
   bool IsProtected() const;
   StringX GetSymbols() const    {return GetField(SYMBOLS);}
   StringX GetPolicyName() const {return GetField(POLICYNAME);}
-  void GetKBShortcut(int32 &iKBShortcut) const;
+  int32 GetKBShortcut(int32 &iKBShortcut) const;
   StringX GetKBShortcut() const;
 
   StringX GetFieldValue(FieldType ft) const;
@@ -228,19 +228,19 @@ public:
   void SetURL(const StringX &url); // V30
   void SetAutoType(const StringX &autotype); // V30
   void SetATime() {SetTime(ATIME);}  // V30
-  void SetATime(time_t t) {SetTime(ATIME, t);}  // V30
+  void SetATime(uint64 t) {SetTime(ATIME, t);}  // V30
   bool SetATime(const stringT &time_str) {return SetTime(ATIME, time_str);}  // V30
   void SetCTime() {SetTime(CTIME);}  // V30
-  void SetCTime(time_t t) {SetTime(CTIME, t);}  // V30
+  void SetCTime(uint64 t) {SetTime(CTIME, t);}  // V30
   bool SetCTime(const stringT &time_str) {return SetTime(CTIME, time_str);}  // V30
   void SetXTime() {SetTime(XTIME);}  // V30
   void SetXTime(time_t t) {SetTime(XTIME, t);}  // V30
   bool SetXTime(const stringT &time_str) {return SetTime(XTIME, time_str);}  // V30
   void SetPMTime() {SetTime(PMTIME);}  // V30
-  void SetPMTime(time_t t) {SetTime(PMTIME, t);}  // V30
+  void SetPMTime(uint64 t) {SetTime(PMTIME, t);}  // V30
   bool SetPMTime(const stringT &time_str) {return SetTime(PMTIME, time_str);}  // V30
   void SetRMTime() {SetTime(RMTIME);}  // V30
-  void SetRMTime(time_t t) {SetTime(RMTIME, t);}  // V30
+  void SetRMTime(uint64 t) {SetTime(RMTIME, t);}  // V30
   bool SetRMTime(const stringT &time_str) {return SetTime(RMTIME, time_str);}  // V30
   void SetXTimeInt(int32 &xint); // V30
   bool SetXTimeInt(const stringT &xint_str); // V30
@@ -248,16 +248,16 @@ public:
   void SetPWPolicy(const PWPolicy &pwp);
   bool SetPWPolicy(const stringT &cs_pwp);
   void SetRunCommand(const StringX &cs_RunCommand);
-  void SetDCA(const int16 &iDCA, const bool bShift = false);
+  void SetDCA(int16 &iDCA, const bool bShift = false);
   bool SetDCA(const stringT &cs_DCA, const bool bShift = false);
-  void SetShiftDCA(const int16 &iDCA) { SetDCA(iDCA, true); }
+  void SetShiftDCA(int16 &iDCA) { SetDCA(iDCA, true); }
   bool SetShiftDCA(const stringT &cs_DCA) {return SetDCA(cs_DCA, true);}
   void SetEmail(const StringX &sx_email);
   void SetProtected(bool bOnOff);
   void SetSymbols(const StringX &sx_symbols);
   void SetPolicyName(const StringX &sx_PolicyName);
   void SetKBShortcut(const StringX &sx_KBShortcut);
-  void SetKBShortcut(const int32 &iKBShortcut);
+  void SetKBShortcut(int32 iKBShortcut);
 
   void SetFieldValue(FieldType ft, const StringX &value);
 

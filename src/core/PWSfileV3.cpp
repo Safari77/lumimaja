@@ -13,6 +13,7 @@
 #include "PWSFilters.h"
 #include "PWSdirs.h"
 #include "PWSprefs.h"
+#include "PWStime.h"
 #include "core.h"
 
 #include "os/debug.h"
@@ -359,10 +360,11 @@ int PWSfileV3::WriteHeader()
   }
 
   // Write out time of this update
-  putInt64(reinterpret_cast<unsigned char *>(&m_hdr.m_whenlastsaved), time(NULL));
-  PWSfile::WriteRaw(HDR_LASTUPDATETIME,
-                    reinterpret_cast<unsigned char *>(&m_hdr.m_whenlastsaved),
-                    sizeof(&m_hdr.m_whenlastsaved));
+  {
+    PWStime pwt; // c'tor set current time
+    PWSfile::WriteRaw(HDR_LASTUPDATETIME, pwt, PWStime::TIME_LEN);
+    m_hdr.m_whenlastsaved = pwt;
+  }
 
   // Write out who saved it!
   {
@@ -393,23 +395,25 @@ int PWSfileV3::WriteHeader()
   }
 
   if (!m_hdr.m_RUEList.empty()) {
-    coStringXStream oss;
     size_t num = m_hdr.m_RUEList.size();
     if (num > 255)
-      num = 255;  // Do not exceed 2 hex character length field
-    oss << setw(2) << setfill('0') << hex << num;
+      num = 255; // Only save up to max as defined by FormatV3.
+
+    size_t buflen = (num * sizeof(uuid_array_t)) + 1;
+    unsigned char *buf = new unsigned char[buflen];
+    buf[0] = (unsigned char)num;
+    unsigned char *buf_ptr = buf + 1;
+
     UUIDListIter iter = m_hdr.m_RUEList.begin();
-    // Only save up to max as defined by FormatV3.
+
     for (size_t n = 0; n < num; n++, iter++) {
       const uuid_array_t *rep = iter->GetARep();
-      for (size_t i = 0; i < sizeof(uuid_array_t); i++) {
-        oss << setw(2) << setfill('0') << hex
-            << static_cast<unsigned int>((*rep)[i]);
-      }
+      memcpy(buf_ptr, rep, sizeof(uuid_array_t));
+      buf_ptr += sizeof(uuid_array_t);
     }
 
-    PWSfile::WriteRaw(HDR_RUE, reinterpret_cast<const unsigned char *>(oss.str().c_str()),
-                      oss.str().length());
+    PWSfile::WriteRaw(HDR_RUE, buf, buflen);
+    delete[] buf;
   }
 
   // Named Policies
@@ -610,13 +614,12 @@ int PWSfileV3::ReadHeader()
       break;
 
     case HDR_LASTUPDATETIME: /* When last saved */
-      if (utf8Len == 8) {
-        m_hdr.m_whenlastsaved = getInt64(utf8);
-      } else {
-        pws_os::Trace0(_T("FromUTF8(m_whenlastsaved) invalid\n"));
-        exit(1);
-      }
+    {
+      ASSERT(utf8Len == PWStime::TIME_LEN);
+      PWStime pwt(utf8);
+      m_hdr.m_whenlastsaved = pwt;
       break;
+    }
 
     case HDR_LASTUPDATEAPPLICATION: /* and by what */
       if (utf8 != NULL) utf8[utf8Len] = '\0';
@@ -696,32 +699,20 @@ int PWSfileV3::ReadHeader()
 
     case HDR_RUE:
       {
-        if (utf8 != NULL) utf8[utf8Len] = '\0';
-        // All data is character representation of hex - i.e. 0-9a-f
-        // No need to convert from char.
-        std::string temp = reinterpret_cast<char *>(utf8);
-
+        // All data is binary
         // Get number of entries
-        int num(0);
-        std::istringstream is(temp.substr(0, 2));
-        is >> hex >> num;
+        int num = utf8[0];
 
         // verify we have enough data
-        if (utf8Len != num * sizeof(uuid_array_t) * 2 + 2)
+        if (utf8Len != num * sizeof(uuid_array_t) + 1)
           break;
 
         // Get the entries and save them
-        size_t j = 2;
-        for (int n = 0; n < num; n++) {
-          unsigned int x(0);
-          uuid_array_t tmp_ua;
-          for (size_t i = 0; i < sizeof(uuid_array_t); i++, j += 2) {
-            stringstream ss;
-            ss.str(temp.substr(j, 2));
-            ss >> hex >> x;
-            tmp_ua[i] = static_cast<unsigned char>(x);
-          }
-          const CUUID uuid(tmp_ua);
+        unsigned char *buf = utf8 + 1;
+        for (int n = 0; n < num; n++, buf += sizeof(uuid_array_t)) {
+          uuid_array_t uax = {0};
+          memcpy(uax, buf, sizeof(uuid_array_t));
+          const CUUID uuid(uax);
           if (uuid != CUUID::NullUUID())
             m_hdr.m_RUEList.push_back(uuid);
         }
@@ -739,76 +730,56 @@ int PWSfileV3::ReadHeader()
       break;
 
     case HDR_PSWDPOLICIES:
-      /**
-       * Very sad situation here: this field code was also assigned to
-       * YUBI_SK in 3.27Y. Here we try to infer the actual type based
-       * on the actual value stored in the field.
-       * Specifically, YUBI_SK is YUBI_SK_LEN bytes of binary data, whereas
-       * HDR_PSWDPOLICIES is of varying length, starting with at least 4 hex
-       * digits.
-       */
-      if (utf8Len != HeaderRecord::YUBI_SK_LEN ||
-          (utf8Len >= 4 &&
-           isxdigit(utf8[0]) && isxdigit(utf8[1]) &&
-           isxdigit(utf8[1]) && isxdigit(utf8[2]))) {
-        if (utf8 != NULL) utf8[utf8Len] = '\0';
-        utf8status = m_utf8conv.FromUTF8(utf8, utf8Len, text);
-        if (utf8status) {
-          const size_t recordlength = text.length();
-          StringX sxBlank(_T(" "));  // Needed in case hex value is all zeroes!
-          StringX sxTemp;
+      {
+        const size_t minPolLen = 1 + 1 + 1 + 2 + 2*5 + 1; // see formatV4.txt
+        if (utf8Len < minPolLen)
+          break; // Error
 
-          // Get number of polices
-          sxTemp = text.substr(0, 2) + sxBlank;
-          size_t j = 2;  // Skip over # name entries
-          iStringXStream is(sxTemp);
-          int num(0);
-          is >> hex >> num;
+        unsigned char *buf_ptr = utf8;
+        const unsigned char *max_ptr = utf8 + utf8Len; // for sanity checks
+        int num = *buf_ptr++;
 
-          // Get the policies and save them
-          for (int n = 0; n < num; n++) {
-            if (j > recordlength) break;  // Error
+        // Get the policies and save them
+        for (int n = 0; n < num; n++) {
+          StringX sxPolicyName;
+          PWPolicy pwp;
 
-            int namelength, symbollength;
-
-            sxTemp = text.substr(j, 2) + sxBlank;
-            iStringXStream tmp_is(sxTemp);
-            j += 2;  // Skip over name length
-
-            tmp_is >> hex >> namelength;
-            if (j + namelength > recordlength) break;  // Error
-
-            StringX sxPolicyName = text.substr(j, namelength);
-            j += namelength;  // Skip over name
-            if (j + 19 > recordlength) break;  // Error
-
-            StringX cs_pwp(text.substr(j, 19));
-            PWPolicy pwp(cs_pwp);
-            j += 19;  // Skip over pwp
-
-            if (j + 2 > recordlength) break;  // Error
-            sxTemp = text.substr(j, 2) + sxBlank;
-            tmp_is.str(sxTemp);
-            j += 2;  // Skip over symbols length
-            tmp_is >> hex >> symbollength;
-
-            StringX sxSymbols;
-            if (symbollength != 0) {
-              if (j + symbollength > recordlength) break;  // Error
-              sxSymbols = text.substr(j, symbollength);
-              j += symbollength;  // Skip over symbols
-            }
-            pwp.symbols = sxSymbols;
-
-            pair< map<StringX, PWPolicy>::iterator, bool > pr;
-            pr = m_MapPSWDPLC.insert(PSWDPolicyMapPair(sxPolicyName, pwp));
-            if (pr.second == false) break; // Error
+          int nameLen = *buf_ptr++;
+          // need to tack on null byte to name before conversion
+          unsigned char *nmbuf = new unsigned char[nameLen + 1];
+          memcpy(nmbuf, buf_ptr, nameLen); nmbuf[nameLen] = 0;
+          utf8status = m_utf8conv.FromUTF8(nmbuf, nameLen, sxPolicyName);
+          trashMemory(nmbuf, nameLen); delete[] nmbuf;
+          if (!utf8status)
+            continue;
+          buf_ptr += nameLen;
+          if (buf_ptr > max_ptr)
+            break; // Error
+          pwp.flags = getInt16(buf_ptr);            buf_ptr += 2;
+          pwp.length = getInt16(buf_ptr);           buf_ptr += 2;
+          pwp.lowerminlength = getInt16(buf_ptr);   buf_ptr += 2;
+          pwp.upperminlength = getInt16(buf_ptr);   buf_ptr += 2;
+          pwp.digitminlength = getInt16(buf_ptr);   buf_ptr += 2;
+          pwp.symbolminlength = getInt16(buf_ptr);  buf_ptr += 2;
+          if (buf_ptr > max_ptr)
+            break; // Error
+          int symLen = *buf_ptr++;
+          if (symLen > 0) {
+            // need to tack on null byte to symbols before conversion
+            unsigned char *symbuf = new unsigned char[symLen + 1];
+            memcpy(symbuf, buf_ptr, symLen); symbuf[symLen] = 0;
+            utf8status = m_utf8conv.FromUTF8(symbuf, symLen, pwp.symbols);
+            trashMemory(symbuf, symLen); delete[] symbuf;
+            if (!utf8status)
+              continue;
+            buf_ptr += symLen;
           }
-        }
-      } else { // Looks like YUBI_OLD_SK: field length is exactly YUBI_SK_LEN
-        //        and at least one non-hex character in first 4 of field.
-        m_hdr.m_yubi_sk = new unsigned char[HeaderRecord::YUBI_SK_LEN];
-        memcpy(m_hdr.m_yubi_sk, utf8, HeaderRecord::YUBI_SK_LEN);
+          if (buf_ptr > max_ptr)
+            break; // Error
+          pair< map<StringX, PWPolicy>::iterator, bool > pr;
+          pr = m_MapPSWDPLC.insert(PSWDPolicyMapPair(sxPolicyName, pwp));
+          if (pr.second == false) break; // Error
+        } // iterate over named policies
       }
       break;
 

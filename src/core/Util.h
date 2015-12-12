@@ -50,14 +50,25 @@ extern void ConvertString(const StringX &text,
 /*
 * Get an integer that is stored in little-endian format not assuming any alignments
 */
-inline uint32 getInt32(const unsigned char buf[4])
+inline uint16 getInt16(const unsigned char buf[2])
 {
-  return (buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
+  return buf[0] | (buf[1] << 8);
 }
 
 /*
 * Store an integer that is stored in little-endian format
 */
+inline void putInt16(unsigned char buf[2], const uint16 val)
+{
+  buf[0] = val;
+  buf[1] = (val >> 8);
+}
+
+inline uint32 getInt32(const unsigned char buf[4])
+{
+  return (buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24));
+}
+
 inline void putInt32(unsigned char buf[4], const uint32 val)
 {
   buf[0] = val;
@@ -66,9 +77,6 @@ inline void putInt32(unsigned char buf[4], const uint32 val)
   buf[3] = (val >> 24);
 }
 
-/*
-* Get an integer that is stored in little-endian format not assuming any alignments
-*/
 inline uint64 getInt64(const unsigned char buf[8])
 {
   return (buf[0] | (buf[1] << 8) | (buf[2] << 16) | (buf[3] << 24) |
@@ -76,9 +84,6 @@ inline uint64 getInt64(const unsigned char buf[8])
           (uint64(buf[6]) << 48) | (uint64(buf[7]) << 56));
 }
 
-/*
-* Store an integer that is stored in little-endian format
-*/
 inline void putInt64(unsigned char buf[8], const uint64 val)
 {
   buf[0] = val;

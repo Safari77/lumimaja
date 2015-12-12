@@ -35,8 +35,7 @@ public:
     HDR_RESERVED1             = 0x0c,     // added in format 0x030?
     HDR_RESERVED2             = 0x0d,     // added in format 0x030?
     HDR_RESERVED3             = 0x0e,     // added in format 0x030?
-    HDR_RUE                   = 0x0f,     // added in format 0x0307
-    HDR_YUBI_OLD_SK           = 0x10,     // Yubi-specific: format 0x030a
+    HDR_RUE                   = 0x0f,     // added in format 0x0307 - Recently Used Entries
     HDR_PSWDPOLICIES          = 0x10,     // added in format 0x030A
     HDR_EMPTYGROUP            = 0x11,     // added in format 0x030B
     HDR_YUBI_SK               = 0x12,     // Yubi-specific: format 0x030c

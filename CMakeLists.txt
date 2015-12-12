@@ -160,6 +160,7 @@ list(APPEND LUMIMAJA_HDRS
     src/core/VerifyFormat.h
     src/core/UnknownField.h
     src/core/PWPolicy.h
+    src/core/PWStime.h
     src/core/Command.h
     src/core/CommandInterface.h
     src/core/XML/Xerces/XFileSAX2Handlers.h
@@ -275,6 +276,7 @@ list(APPEND LUMIMAJA_SRCS
     src/core/PWSrand.cpp
     src/core/VerifyFormat.cpp
     src/core/PWPolicy.cpp
+    src/core/PWStime.cpp
     src/core/CoreOtherDB.cpp
     src/core/pugixml/pugixml.cpp
     src/core/ItemField.cpp
