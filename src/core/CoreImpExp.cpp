@@ -2357,12 +2357,6 @@ stringT PWScore::GetXMLPWPolicies(const OrderedItemList *pOIL)
       if (iter->second.flags & PWPolicy::UseSymbols)
         os << "\t\t\t<PWUseSymbols>1</PWUseSymbols>" << endl;
 
-      if (iter->second.flags & PWPolicy::UseHexDigits)
-        os << "\t\t\t<PWUseHexDigits>1</PWUseHexDigits>" << endl;
-
-      if (iter->second.flags & PWPolicy::UseEasyVision)
-        os << "\t\t\t<PWUseEasyVision>1</PWUseEasyVision>" << endl;
-
       if (iter->second.flags & PWPolicy::MakePronounceable)
         os << "\t\t\t<PWMakePronounceable>1</PWMakePronounceable>" << endl;
 

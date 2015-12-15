@@ -310,10 +310,6 @@ namespace {
     make_pair(IDSC_XMLSAVEFAILURE, _("Unable to save configuration file")),
     make_pair(IDSC_XMLVALIDATION, _("validation")),
     make_pair(IDSC_YES, _("Yes")),
-    make_pair(IDSC_YESEASYVISON, _("Yes - EasyVision Symbols: %ls")),
-    make_pair(IDSC_YESNUMBER, _("Yes (at least %d)")),
-    make_pair(IDSC_YESPRONOUNCEABLE, _("Yes - Pronounceable Symbols: %ls")),
-    make_pair(IDSC_YESSYMBOLS, _("Yes - At least %d from %ls: %ls")),
   }; // Pairs array
 } // anonymous namespace
 

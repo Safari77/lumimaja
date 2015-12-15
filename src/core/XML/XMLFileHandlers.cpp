@@ -239,24 +239,6 @@ void XMLFileHandlers::ProcessEndElement(const int icurrent_element)
       else
         bpref = PWSprefs::PWUseSymbols;
       break;
-    case XLE_PREF_PWUSEHEXDIGITS:
-      if (m_bPolicyBeingProcessed)
-        if (m_sxElemContent == _T("1"))
-          m_Named_pwp.flags |= PWPolicy::UseHexDigits;
-        else
-          m_Named_pwp.flags &= ~PWPolicy::UseHexDigits;
-      else
-        bpref = PWSprefs::PWUseHexDigits;
-      break;
-    case XLE_PREF_PWUSEEASYVISION:
-      if (m_bPolicyBeingProcessed)
-        if (m_sxElemContent == _T("1"))
-          m_Named_pwp.flags |= PWPolicy::UseEasyVision;
-        else
-          m_Named_pwp.flags &= ~PWPolicy::UseEasyVision;
-      else
-        bpref = PWSprefs::PWUseEasyVision;
-      break;
     case XLE_PREF_MAINTAINDATETIMESTAMPS:
       bpref = PWSprefs::MaintainDateTimeStamps;
       break;
@@ -308,30 +290,6 @@ void XMLFileHandlers::ProcessEndElement(const int icurrent_element)
       return;
     case XLE_PREF_NUMPWHISTORYDEFAULT:
       ipref = PWSprefs::NumPWHistoryDefault;
-      break;
-    case XLE_PREF_PWDIGITMINLENGTH:
-      if (m_bPolicyBeingProcessed)
-        m_Named_pwp.digitminlength = _ttoi(m_sxElemContent.c_str());
-      else
-        ipref = PWSprefs::PWDigitMinLength;
-      break;
-    case XLE_PREF_PWLOWERCASEMINLENGTH:
-      if (m_bPolicyBeingProcessed)
-         m_Named_pwp.lowerminlength = _ttoi(m_sxElemContent.c_str());
-      else
-        ipref = PWSprefs::PWLowercaseMinLength;
-      break;
-    case XLE_PREF_PWSYMBOLMINLENGTH:
-      if (m_bPolicyBeingProcessed)
-        m_Named_pwp.symbolminlength = _ttoi(m_sxElemContent.c_str());
-      else
-        ipref = PWSprefs::PWSymbolMinLength;
-      break;
-    case XLE_PREF_PWUPPERCASEMINLENGTH:
-      if (m_bPolicyBeingProcessed)
-        m_Named_pwp.upperminlength = _ttoi(m_sxElemContent.c_str());
-      else
-        ipref = PWSprefs::PWUppercaseMinLength;
       break;
     // String DB preferences
     case XLE_PREF_DEFAULTUSERNAME:
@@ -513,18 +471,6 @@ void XMLFileHandlers::ProcessEndElement(const int icurrent_element)
         m_cur_entry->pwp.flags |= PWPolicy::MakePronounceable;
       else
         m_cur_entry->pwp.flags &= ~PWPolicy::MakePronounceable;
-      break;
-    case XLE_ENTRY_PWDIGITMINLENGTH:
-      m_cur_entry->pwp.digitminlength = _ttoi(m_sxElemContent.c_str());
-      break;
-    case XLE_ENTRY_PWLOWERCASEMINLENGTH:
-      m_cur_entry->pwp.lowerminlength = _ttoi(m_sxElemContent.c_str());
-      break;
-    case XLE_ENTRY_PWSYMBOLMINLENGTH:
-      m_cur_entry->pwp.symbolminlength = _ttoi(m_sxElemContent.c_str());
-      break;
-    case XLE_ENTRY_PWUPPERCASEMINLENGTH:
-      m_cur_entry->pwp.upperminlength = _ttoi(m_sxElemContent.c_str());
       break;
     case XLE_PASSWORDSAFE:
     case XLE_PWHISTORY:

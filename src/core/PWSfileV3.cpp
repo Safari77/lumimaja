@@ -757,10 +757,6 @@ int PWSfileV3::ReadHeader()
             break; // Error
           pwp.flags = getInt16(buf_ptr);            buf_ptr += 2;
           pwp.length = getInt16(buf_ptr);           buf_ptr += 2;
-          pwp.lowerminlength = getInt16(buf_ptr);   buf_ptr += 2;
-          pwp.upperminlength = getInt16(buf_ptr);   buf_ptr += 2;
-          pwp.digitminlength = getInt16(buf_ptr);   buf_ptr += 2;
-          pwp.symbolminlength = getInt16(buf_ptr);  buf_ptr += 2;
           if (buf_ptr > max_ptr)
             break; // Error
           int symLen = *buf_ptr++;

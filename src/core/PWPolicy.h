@@ -42,16 +42,10 @@ struct PWPolicy {
 
   unsigned short flags; // bitwise-or of the above
   int length;
-  int digitminlength;
-  int lowerminlength;
-  int symbolminlength;
-  int upperminlength;
   StringX symbols; // policy-specific set of 'symbol' characters
   size_t usecount; // how many entries use this policy?
 
   PWPolicy() : flags(0), length(0), 
-               digitminlength(0), lowerminlength(0),
-               symbolminlength(0), upperminlength(0),
                symbols(_T("")), usecount(0) {}
 
   // PWPolicy has a persistent textual representation:
@@ -60,10 +54,6 @@ struct PWPolicy {
   // copy c'tor and assignment operator, standard idioms
   PWPolicy(const PWPolicy &that)
     : flags(that.flags), length(that.length),
-      digitminlength(that.digitminlength),
-      lowerminlength(that.lowerminlength),
-      symbolminlength(that.symbolminlength),
-      upperminlength(that.upperminlength),
       symbols(that.symbols), usecount(that.usecount) {}
 
   PWPolicy &operator=(const PWPolicy &that)
@@ -71,10 +61,6 @@ struct PWPolicy {
     if (this != &that) {
       flags  = that.flags;
       length = that.length;
-      digitminlength  = that.digitminlength;
-      lowerminlength  = that.lowerminlength;
-      symbolminlength = that.symbolminlength;
-      upperminlength  = that.upperminlength;
       symbols = that.symbols;
       usecount = that.usecount;
       // don't care about usecount!
@@ -90,8 +76,6 @@ struct PWPolicy {
   void Empty()
   { 
     flags = 0; length = 0;
-    digitminlength  = lowerminlength = 0;
-    symbolminlength = upperminlength = 0;
     symbols = _T(""); usecount = 0;
   }
 

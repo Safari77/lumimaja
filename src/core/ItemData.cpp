@@ -901,25 +901,9 @@ string CItemData::GetXML(unsigned id, const FieldBits &bsExport,
         oss << "\t\t\t<PWUseDigits>1</PWUseDigits>" << endl;
       if (pwp.flags & PWPolicy::UseSymbols)
         oss << "\t\t\t<PWUseSymbols>1</PWUseSymbols>" << endl;
-      if (pwp.flags & PWPolicy::UseHexDigits)
-        oss << "\t\t\t<PWUseHexDigits>1</PWUseHexDigits>" << endl;
-      if (pwp.flags & PWPolicy::UseEasyVision)
-        oss << "\t\t\t<PWUseEasyVision>1</PWUseEasyVision>" << endl;
       if (pwp.flags & PWPolicy::MakePronounceable)
         oss << "\t\t\t<PWMakePronounceable>1</PWMakePronounceable>" << endl;
 
-      if (pwp.lowerminlength > 0) {
-        oss << "\t\t\t<PWLowercaseMinLength>" << pwp.lowerminlength << "</PWLowercaseMinLength>" << endl;
-      }
-      if (pwp.upperminlength > 0) {
-        oss << "\t\t\t<PWUppercaseMinLength>" << pwp.upperminlength << "</PWUppercaseMinLength>" << endl;
-      }
-      if (pwp.digitminlength > 0) {
-        oss << "\t\t\t<PWDigitMinLength>" << pwp.digitminlength << "</PWDigitMinLength>" << endl;
-      }
-      if (pwp.symbolminlength > 0) {
-        oss << "\t\t\t<PWSymbolMinLength>" << pwp.symbolminlength << "</PWSymbolMinLength>" << endl;
-      }
       oss << "\t\t</PasswordPolicy>" << endl;
     }
   } else {

@@ -95,7 +95,7 @@ public:
     ShowPasswordInTree,
     SortAscending,
     UseDefaultUser, SaveImmediately, PWUseLowercase, PWUseUppercase,
-    PWUseDigits, PWUseSymbols, PWUseHexDigits, PWUseEasyVision,
+    PWUseDigits, PWUseSymbols,
     DontAskQuestion, DeleteQuestion, DCShowsPassword,
     DontAskMinimizeClearYesNo, // Obsoleted in 3.13 - replaced by 2 separate
     DatabaseClear,
@@ -129,8 +129,7 @@ public:
     SortedColumn, PWDefaultLength, MaxMRUItems, IdleTimeout,
     DoubleClickAction, HotKey, MaxREItems, TreeDisplayStatusAtOpen,
     NumPWHistoryDefault, BackupSuffix, BackupMaxIncremented,
-    PreExpiryWarnDays, ClosedTrayIconColour, PWDigitMinLength,
-    PWLowercaseMinLength, PWSymbolMinLength, PWUppercaseMinLength,
+    PreExpiryWarnDays, ClosedTrayIconColour,
     OptShortcutColumnWidth, ShiftDoubleClickAction, DefaultAutotypeDelay,
     DlgOrientation, TimedTaskChainDelay,
     NumIntPrefs};

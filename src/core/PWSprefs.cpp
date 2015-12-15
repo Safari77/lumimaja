@@ -78,8 +78,6 @@ const PWSprefs::boolPref PWSprefs::m_bool_prefs[NumBoolPrefs] = {
   {_T("PWUseUppercase"), true, ptDatabase},                 // database
   {_T("PWUseDigits"), true, ptDatabase},                    // database
   {_T("PWUseSymbols"), true, ptDatabase},                   // database
-  {_T("PWUseHexDigits"), false, ptDatabase},                // database
-  {_T("PWUseEasyVision"), false, ptDatabase},               // database
   {_T("dontaskquestion"), false, ptApplication},            // application
   {_T("deletequestion"), false, ptApplication},             // application
   {_T("DCShowsPassword"), false, ptApplication},            // application
@@ -158,10 +156,6 @@ const PWSprefs::intPref PWSprefs::m_int_prefs[NumIntPrefs] = {
   {_T("PreExpiryWarnDays"), 1, ptApplication, 1, 30},               // application
   {_T("ClosedTrayIconColour"), stiBlack, ptApplication,
                                stiBlack, stiYellow},                // application
-  {_T("PWDigitMinLength"), 0, ptDatabase, 0, 1024},                 // database
-  {_T("PWLowercaseMinLength"), 0, ptDatabase, 0, 1024},             // database
-  {_T("PWSymbolMinLength"), 0, ptDatabase, 0, 1024},                // database
-  {_T("PWUppercaseMinLength"), 0, ptDatabase, 0, 1024},             // database
   {_T("OptShortcutColumnWidth"), 92, ptApplication, 10, 512},       // application
   {_T("ShiftDoubleClickAction"), DoubleClickCopyUsername, ptApplication,
                             minDCA, maxDCA},                        // application
@@ -442,18 +436,10 @@ PWPolicy PWSprefs::GetDefaultPolicy(const bool bUseCopy) const
     pwp.flags |= PWPolicy::UseDigits;
   if (GetPref(PWUseSymbols, bUseCopy))
     pwp.flags |= PWPolicy::UseSymbols;
-  if (GetPref(PWUseHexDigits, bUseCopy))
-    pwp.flags |= PWPolicy::UseHexDigits;
-  if (GetPref(PWUseEasyVision, bUseCopy))
-    pwp.flags |= PWPolicy::UseEasyVision;
   if (GetPref(PWMakePronounceable, bUseCopy))
     pwp.flags |= PWPolicy::MakePronounceable;
 
   pwp.length = GetPref(PWDefaultLength, bUseCopy);
-  pwp.digitminlength = GetPref(PWDigitMinLength, bUseCopy);
-  pwp.lowerminlength = GetPref(PWLowercaseMinLength, bUseCopy);
-  pwp.symbolminlength = GetPref(PWSymbolMinLength, bUseCopy);
-  pwp.upperminlength = GetPref(PWUppercaseMinLength, bUseCopy);
   pwp.symbols = GetPref(DefaultSymbols, bUseCopy);
   return pwp;
 }
@@ -468,18 +454,10 @@ void PWSprefs::SetDefaultPolicy(const PWPolicy &pol, const bool bUseCopy)
           (pol.flags & PWPolicy::UseDigits) != 0, bUseCopy);
   SetPref(PWUseSymbols,
           (pol.flags & PWPolicy::UseSymbols) != 0, bUseCopy);
-  SetPref(PWUseHexDigits,
-          (pol.flags & PWPolicy::UseHexDigits) != 0, bUseCopy);
-  SetPref(PWUseEasyVision,
-          (pol.flags & PWPolicy::UseEasyVision) != 0, bUseCopy);
   SetPref(PWMakePronounceable,
           (pol.flags & PWPolicy::MakePronounceable) != 0, bUseCopy);
 
   SetPref(PWDefaultLength, pol.length, bUseCopy);
-  SetPref(PWDigitMinLength, pol.digitminlength, bUseCopy);
-  SetPref(PWLowercaseMinLength, pol.lowerminlength, bUseCopy);
-  SetPref(PWSymbolMinLength, pol.symbolminlength, bUseCopy);
-  SetPref(PWUppercaseMinLength, pol.upperminlength, bUseCopy);
   SetPref(DefaultSymbols, pol.symbols, bUseCopy);
 }
 

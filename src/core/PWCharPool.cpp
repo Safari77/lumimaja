@@ -28,127 +28,51 @@ using namespace std;
 #define LENGTH(s) (sizeof(s)/sizeof(s[0]) - 1)
 
 const charT CPasswordCharPool::std_lowercase_chars[] = _T("abcdefghijklmnopqrstuvwxyz");
-const size_t CPasswordCharPool::std_lowercase_len = LENGTH(std_lowercase_chars);
-
 const charT CPasswordCharPool::std_uppercase_chars[] = _T("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-const size_t CPasswordCharPool::std_uppercase_len = LENGTH(std_uppercase_chars);
-
 const charT CPasswordCharPool::std_digit_chars[] = _T("0123456789");
-const size_t CPasswordCharPool::std_digit_len = LENGTH(std_digit_chars);
-
-const charT CPasswordCharPool::std_hexdigit_chars[] = _T("0123456789abcdef");
-const size_t CPasswordCharPool::std_hexdigit_len = LENGTH(std_hexdigit_chars);
-
 const charT CPasswordCharPool::std_symbol_chars[] = _T("+-=_@#$%^&;:,.<>/~\\[](){}?!|*");
-const size_t CPasswordCharPool::std_symbol_len = LENGTH(std_symbol_chars);
-
-const charT CPasswordCharPool::easyvision_lowercase_chars[] = _T("abcdefghijkmnopqrstuvwxyz");
-const size_t CPasswordCharPool::easyvision_lowercase_len = LENGTH(easyvision_lowercase_chars);
-
-const charT CPasswordCharPool::easyvision_uppercase_chars[] = _T("ABCDEFGHJKLMNPQRTUVWXY");
-const size_t CPasswordCharPool::easyvision_uppercase_len = LENGTH(easyvision_uppercase_chars);
-
-const charT CPasswordCharPool::easyvision_digit_chars[] = _T("346789");
-const size_t CPasswordCharPool::easyvision_digit_len = LENGTH(easyvision_digit_chars);
-
-const charT CPasswordCharPool::easyvision_symbol_chars[] = _T("+-=_@#$%^&<>/~\\?*");
-const size_t CPasswordCharPool::easyvision_symbol_len = LENGTH(easyvision_symbol_chars);
-
-const charT CPasswordCharPool::easyvision_hexdigit_chars[] = _T("0123456789abcdef");
-const size_t CPasswordCharPool::easyvision_hexdigit_len = LENGTH(easyvision_hexdigit_chars);
-
-// See the values of "charT sym" in the static const structure "leets" below
 const charT CPasswordCharPool::pronounceable_symbol_chars[] = _T("@&(#!|$+");
 
 //-----------------------------------------------------------------------------
 
 CPasswordCharPool::CPasswordCharPool(const PWPolicy &policy)
   : m_pwlen(policy.length),
-    m_numlowercase(policy.lowerminlength), m_numuppercase(policy.upperminlength),
-    m_numdigits(policy.digitminlength), m_numsymbols(policy.symbolminlength),
     m_uselowercase(policy.flags & PWPolicy::UseLowercase ? true : false),
     m_useuppercase(policy.flags & PWPolicy::UseUppercase ? true : false),
     m_usedigits(policy.flags & PWPolicy::UseDigits ? true : false),
     m_usesymbols(policy.flags & PWPolicy::UseSymbols ? true : false),
-    m_usehexdigits(policy.flags & PWPolicy::UseHexDigits ? true : false),
     m_pronounceable(policy.flags & PWPolicy::MakePronounceable ? true : false),
     m_bDefaultSymbols(false)
 {
   ASSERT(m_pwlen > 0);
-  ASSERT(m_uselowercase || m_useuppercase || 
-         m_usedigits    || m_usesymbols   || 
-         m_usehexdigits || m_pronounceable);
+  ASSERT(m_uselowercase || m_useuppercase || m_usedigits ||
+         m_usesymbols   || m_pronounceable);
 
-  // Following "normalization" needed to keep MakePassword()
-  // from going into an infinite loop if we manage to become inconsistent (BR1228)
-  if (!m_uselowercase)
-    m_numlowercase = 0;
-  if (!m_useuppercase)
-    m_numuppercase = 0;
-  if (!m_usedigits)
-    m_numdigits = 0;
-  if (!m_usesymbols)
-    m_numsymbols = 0;
-
-  if (policy.flags & PWPolicy::UseEasyVision) {
-    m_char_arrays[LOWERCASE] = easyvision_lowercase_chars;
-    m_char_arrays[UPPERCASE] = easyvision_uppercase_chars;
-    m_char_arrays[DIGIT] = easyvision_digit_chars;
-    m_char_arrays[SYMBOL] = policy.symbols.empty() ? 
-      easyvision_symbol_chars : _tcsdup(policy.symbols.c_str());
-    m_char_arrays[HEXDIGIT] = easyvision_hexdigit_chars;
-
-    m_lengths[LOWERCASE] = m_uselowercase ? easyvision_lowercase_len : 0;
-    m_lengths[UPPERCASE] = m_useuppercase ? easyvision_uppercase_len : 0;
-    m_lengths[DIGIT] = m_usedigits ? easyvision_digit_len : 0;
-    if (m_usesymbols)
-      m_lengths[SYMBOL] = policy.symbols.empty() ? easyvision_symbol_len : policy.symbols.length();
-    else
-      m_lengths[SYMBOL] = 0;
-    m_lengths[HEXDIGIT] = m_usehexdigits ? easyvision_hexdigit_len : 0;
-  } else { // !easyvision
-    m_char_arrays[LOWERCASE] = std_lowercase_chars;
-    m_char_arrays[UPPERCASE] = std_uppercase_chars;
-    m_char_arrays[DIGIT] = std_digit_chars;
-    m_char_arrays[HEXDIGIT] = std_hexdigit_chars;
-
-    m_lengths[LOWERCASE] = m_uselowercase ? std_lowercase_len : 0;
-    m_lengths[UPPERCASE] = m_useuppercase ? std_uppercase_len : 0;
-    m_lengths[DIGIT] = m_usedigits ? std_digit_len : 0;
-    m_lengths[HEXDIGIT] = m_usehexdigits ? std_hexdigit_len : 0;
-
+  m_char_array.assign(L"");
+  if (m_uselowercase) m_char_array += std_lowercase_chars;
+  if (m_useuppercase) m_char_array += std_uppercase_chars;
+  if (m_usedigits) m_char_array += std_digit_chars;
+  if (m_usesymbols) {
     if (policy.symbols.empty()) {
       StringX sx_symbols = PWSprefs::GetInstance()->GetPref(PWSprefs::DefaultSymbols);
       if (sx_symbols.empty()) {
-        m_char_arrays[SYMBOL] = std_symbol_chars;
-        m_lengths[SYMBOL] = m_usesymbols ? std_symbol_len : 0;
+        m_char_array += std_symbol_chars;
       } else {
         m_bDefaultSymbols = true;
-        m_char_arrays[SYMBOL] = _tcsdup(sx_symbols.c_str());
-        m_lengths[SYMBOL] = m_usesymbols ? sx_symbols.length() : 0;
+        m_char_array += sx_symbols.c_str();
       }
     } else {
-      m_char_arrays[SYMBOL] = _tcsdup(policy.symbols.c_str());
-      m_lengths[SYMBOL] = m_usesymbols ? policy.symbols.length() : 0;
+      m_char_array += policy.symbols.c_str();
     }
   }
-
-  // See GetRandomCharType to understand what this does and why
-  m_x[0] = 0;
-  m_sumlengths = 0;
-  for (int i = 0; i < NUMTYPES; i++) {
-    m_x[i+1] = m_x[i] + m_lengths[i];
-    m_sumlengths += m_lengths[i];
-  }
-  ASSERT(m_sumlengths > 0);
+  ASSERT(m_char_array.length() > 0);
+  fprintf(stderr, "m_char_array=[%ls] len=%zu\n",
+          m_char_array.c_str(), m_char_array.length());
 }
 
 CPasswordCharPool::~CPasswordCharPool()
 {
-  if (m_char_arrays[SYMBOL] != NULL &&
-      m_char_arrays[SYMBOL] != std_symbol_chars &&
-      m_char_arrays[SYMBOL] != easyvision_symbol_chars)
-    free(const_cast<charT*>(m_char_arrays[SYMBOL]));
+    m_char_array.assign(L"");
 }
 
 stringT CPasswordCharPool::GetDefaultSymbols()
@@ -167,52 +91,13 @@ void CPasswordCharPool::ResetDefaultSymbols()
   PWSprefs::GetInstance()->SetPref(PWSprefs::DefaultSymbols, std_symbol_chars);
 }
 
-CPasswordCharPool::CharType CPasswordCharPool::GetRandomCharType(unsigned int rand) const
+charT CPasswordCharPool::GetRandomChar() const
 {
-  /*
-  * Following is needed in order to choose a char type with a probability
-  * in proportion to its relative size, i.e., if chartype 'A' has 20 characters,
-  * and chartype 'B' has 10, then the generated password will have twice as
-  * many chars from 'A' than as from 'B'.
-  * Think of m_x as the number axis. We treat the chartypes as intervals which
-  * are laid out successively along the axis. Each number in m_x[] specifies
-  * where one interval ends and the other begins. Choosing a chartype is then
-  * reduced to seeing in which interval a random number falls.
-  * The nice part is that this works correctly for non-selected chartypes
-  * without any special logic.
-  */
-  int i;
-  for (i = 0; i < NUMTYPES; i++) {
-    if (rand < m_x[i+1]) {
-      break;
-    }
-  }
-
-  ASSERT(m_lengths[i] > 0 && i < NUMTYPES);
-  return CharType(i);
-}
-
-charT CPasswordCharPool::GetRandomChar(CPasswordCharPool::CharType t, unsigned int rand) const
-{
-  ASSERT(t < NUMTYPES);
-  ASSERT(m_lengths[t] > 0);
-  rand %= m_lengths[t];
-
-  charT retval = m_char_arrays[t][rand];
-  return retval;
-}
-
-charT CPasswordCharPool::GetRandomChar(CPasswordCharPool::CharType t) const
-{
+  ASSERT(m_char_array.length() > 0);
   PWSrand *ri = PWSrand::GetInstance();
-  uint r = ri->RangeRand(static_cast<uint>(m_lengths[t]));
-  return GetRandomChar(t, r);
+  uint r = ri->RangeRand(static_cast<uint32>(m_char_array.length()));
+  return m_char_array.at(r);
 }
-
-struct RandomWrapper {
-  unsigned int operator()(unsigned int i)
-  {return PWSrand::GetInstance()->RangeRand(i);}
-};
 
 StringX CPasswordCharPool::MakePassword() const
 {
@@ -224,70 +109,17 @@ StringX CPasswordCharPool::MakePassword() const
   // back as the user changes their minds!
 
   ASSERT(m_pwlen > 0);
-  ASSERT(m_uselowercase || m_useuppercase || m_usedigits ||
-         m_usesymbols   || m_usehexdigits || m_pronounceable);
 
-
-  // pronounceable and hex passwords are handled separately:
   if (m_pronounceable)
     return MakePronounceable();
-  if (m_usehexdigits)
-    return MakeHex();
 
-  vector<typeFreq_s> typeFreqs;
-
-  if (m_uselowercase)
-    typeFreqs.push_back(typeFreq_s(this, LOWERCASE, m_numlowercase));
-
-  if (m_useuppercase)
-    typeFreqs.push_back(typeFreq_s(this, UPPERCASE, m_numuppercase));
-
-  if (m_usedigits)
-    typeFreqs.push_back(typeFreq_s(this, DIGIT, m_numdigits));
-
-  if (m_usesymbols)
-    typeFreqs.push_back(typeFreq_s(this, SYMBOL, m_numsymbols));
-
-  // Sort requested char type in decreasing order
-  // of requested (at least) frequency:
-  sort(typeFreqs.begin(), typeFreqs.end(),
-       [](const typeFreq_s &a, const typeFreq_s &b)
-       {
-         return a.numchars > b.numchars;
-       });
-
-  StringX temp;
-  // First meet the 'at least' constraints
-  for (auto iter = typeFreqs.begin(); iter != typeFreqs.end(); iter++)
-    for (uint j = 0; j < iter->numchars; j++) {
-      if (!iter->vchars.empty()) {
-        temp.push_back(iter->vchars.back());
-        iter->vchars.pop_back();
-        if (temp.length() == m_pwlen)
-          goto do_shuffle; // break out of two loops, goto needed
-      }
-    }
-
-
-  // Now fill in the rest
-  while (temp.length() != m_pwlen) {
-    uint i = PWSrand::GetInstance()->RangeRand(typeFreqs.size());
-    if (!typeFreqs[i].vchars.empty()) {
-      temp.push_back(typeFreqs[i].vchars.back());
-      typeFreqs[i].vchars.pop_back();
-      if (temp.length() == m_pwlen)
-        goto do_shuffle; // break out of two loops, goto needed
-    }
+  StringX password = _T("");
+  for (uint i = 0; i < m_pwlen; i++) {
+      password += GetRandomChar();
   }
 
- do_shuffle:
-  // If 'at least' values were non-zero, we have some unwanted order,
-  // se we mix things up a bit:
-  RandomWrapper rnw;
-  random_shuffle(temp.begin(), temp.end(), rnw);
-
-  ASSERT(temp.length() == size_t(m_pwlen));
-  return temp;
+  ASSERT(password.length() == size_t(m_pwlen));
+  return password;
 }
 
 static const struct {
@@ -328,22 +160,6 @@ private:
   bool m_digits, m_symbols;
   int m_i;
 };
-
-static void leet_replace(stringT &password, unsigned int i,
-                         bool usedigits, bool usesymbols)
-{
-  ASSERT(i < password.size());
-  ASSERT(usedigits || usesymbols);
-
-  charT digsub = usedigits ? leets[password[i] - charT('a')].num : 0;
-  charT symsub = usesymbols ? leets[password[i] - charT('a')].sym : 0;
-
-  // if both substitutions possible, select one randomly
-  if (digsub != 0 && symsub != 0 && PWSrand::GetInstance()->RandUInt() % 2)
-    digsub = 0;
-  password[i] = (digsub != 0) ? digsub : symsub;
-  ASSERT(password[i] != 0);
-}
 
 StringX CPasswordCharPool::MakePronounceable() const
 {
@@ -416,21 +232,6 @@ StringX CPasswordCharPool::MakePronounceable() const
    * Also enforce m_useuppercase & m_uselowercase policies
    */
 
-  if (m_usesymbols || m_usedigits) {
-    // fill a vector with indices of substitution candidates
-    vector<int> sc;
-    FillSC fill_sc(sc, (m_usedigits == TRUE), (m_usesymbols == TRUE));
-    for_each(password.begin(), password.end(), fill_sc);
-    if (!sc.empty()) {
-      // choose how many to replace (not too many, but at least one)
-      unsigned int rn = pwsrnd->RangeRand(sc.size() - 1)/2 + 1;
-      // replace some of them
-      RandomWrapper rnw;
-      random_shuffle(sc.begin(), sc.end(), rnw);
-      for (unsigned int i = 0; i < rn; i++)
-        leet_replace(password, sc[i], m_usedigits, m_usesymbols);
-    }
-  }
   // case
   uint i;
   if (m_uselowercase && !m_useuppercase)
@@ -447,17 +248,6 @@ StringX CPasswordCharPool::MakePronounceable() const
     }
 
   return password.c_str();
-}
-
-StringX CPasswordCharPool::MakeHex() const
-{
-  StringX password = _T("");
-  for (uint i = 0; i < m_pwlen; i++) {
-      unsigned int rand = PWSrand::GetInstance()->RangeRand(static_cast<unsigned int>(m_sumlengths));
-      charT ch = GetRandomChar(HEXDIGIT, rand);
-      password += ch;
-  }
-  return password;
 }
 
 bool CPasswordCharPool::CheckPassword(const StringX &pwd, StringX &error)

@@ -44,7 +44,6 @@ BEGIN_EVENT_TABLE( CPasswordPolicy, wxDialog )
   EVT_CHECKBOX( ID_CHECKBOX5, CPasswordPolicy::OnPwPolUseDigits )
   EVT_CHECKBOX( ID_CHECKBOX6, CPasswordPolicy::OnPwPolUseSymbols )
   EVT_BUTTON( ID_RESET_SYMBOLS, CPasswordPolicy::OnResetSymbolsClick )
-  EVT_CHECKBOX( ID_CHECKBOX7, CPasswordPolicy::OnEZreadCBClick )
   EVT_CHECKBOX( ID_CHECKBOX8, CPasswordPolicy::OnPronouceableCBClick )
   EVT_BUTTON( wxID_OK, CPasswordPolicy::OnOkClick )
   EVT_BUTTON( wxID_CANCEL, CPasswordPolicy::OnCancelClick )
@@ -92,9 +91,7 @@ bool CPasswordPolicy::Create( wxWindow* parent, wxWindowID id, const wxString& c
 void CPasswordPolicy::SetDefaultSymbolDisplay(bool restore_defaults)
 {
   stringT symset;
-  if (m_pwUseEasyVision)
-    symset = CPasswordCharPool::GetEasyVisionSymbols();
-  else if (m_pwMakePronounceable)
+  if (m_pwMakePronounceable)
     symset = CPasswordCharPool::GetPronounceableSymbols();
   else {
     if (restore_defaults)
@@ -125,21 +122,11 @@ void CPasswordPolicy::Init()
 ////@begin CPasswordPolicy member initialisation
   m_pwMinsGSzr = NULL;
   m_pwpUseLowerCtrl = NULL;
-  m_pwNumLCbox = NULL;
-  m_pwpLCSpin = NULL;
   m_pwpUseUpperCtrl = NULL;
-  m_pwNumUCbox = NULL;
-  m_pwpUCSpin = NULL;
   m_pwpUseDigitsCtrl = NULL;
-  m_pwNumDigbox = NULL;
-  m_pwpDigSpin = NULL;
   m_pwpSymCtrl = NULL;
-  m_pwNumSymbox = NULL;
-  m_pwpSymSpin = NULL;
   m_OwnSymbols = NULL;
-  m_pwpEasyCtrl = NULL;
   m_pwpPronounceCtrl = NULL;
-  m_pwpHexCtrl = NULL;
 ////@end CPasswordPolicy member initialisation
 }
 
@@ -185,75 +172,23 @@ void CPasswordPolicy::CreateControls()
   m_pwpUseLowerCtrl->SetValue(false);
   m_pwMinsGSzr->Add(m_pwpUseLowerCtrl, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
-  m_pwNumLCbox = new wxBoxSizer(wxHORIZONTAL);
-  m_pwMinsGSzr->Add(m_pwNumLCbox, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("(At least "), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumLCbox->Add(itemStaticText13, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-  m_pwpLCSpin = new wxSpinCtrl( itemDialog1, ID_SPINCTRL5, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
-  m_pwNumLCbox->Add(m_pwpLCSpin, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText15 = new wxStaticText( itemDialog1, wxID_STATIC, wxT(")"), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumLCbox->Add(itemStaticText15, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
   m_pwpUseUpperCtrl = new wxCheckBox( itemDialog1, ID_CHECKBOX4, _("Use UPPERCASE letters"), wxDefaultPosition, wxDefaultSize, 0 );
   m_pwpUseUpperCtrl->SetValue(false);
   m_pwMinsGSzr->Add(m_pwpUseUpperCtrl, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  m_pwNumUCbox = new wxBoxSizer(wxHORIZONTAL);
-  m_pwMinsGSzr->Add(m_pwNumUCbox, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText18 = new wxStaticText( itemDialog1, wxID_STATIC, _("(At least "), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumUCbox->Add(itemStaticText18, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-  m_pwpUCSpin = new wxSpinCtrl( itemDialog1, ID_SPINCTRL6, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
-  m_pwNumUCbox->Add(m_pwpUCSpin, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText20 = new wxStaticText( itemDialog1, wxID_STATIC, wxT(")"), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumUCbox->Add(itemStaticText20, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
   m_pwpUseDigitsCtrl = new wxCheckBox( itemDialog1, ID_CHECKBOX5, _("Use digits"), wxDefaultPosition, wxDefaultSize, 0 );
   m_pwpUseDigitsCtrl->SetValue(false);
   m_pwMinsGSzr->Add(m_pwpUseDigitsCtrl, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
-  m_pwNumDigbox = new wxBoxSizer(wxHORIZONTAL);
-  m_pwMinsGSzr->Add(m_pwNumDigbox, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText23 = new wxStaticText( itemDialog1, wxID_STATIC, _("(At least "), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumDigbox->Add(itemStaticText23, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-  m_pwpDigSpin = new wxSpinCtrl( itemDialog1, ID_SPINCTRL7, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
-  m_pwNumDigbox->Add(m_pwpDigSpin, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText25 = new wxStaticText( itemDialog1, wxID_STATIC, wxT(")"), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumDigbox->Add(itemStaticText25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
   m_pwpSymCtrl = new wxCheckBox( itemDialog1, ID_CHECKBOX6, _("Use symbols (i.e., ., %, $, etc.)"), wxDefaultPosition, wxDefaultSize, 0 );
   m_pwpSymCtrl->SetValue(false);
   m_pwMinsGSzr->Add(m_pwpSymCtrl, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  m_pwNumSymbox = new wxBoxSizer(wxHORIZONTAL);
-  m_pwMinsGSzr->Add(m_pwNumSymbox, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText28 = new wxStaticText( itemDialog1, wxID_STATIC, _("(At least "), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumSymbox->Add(itemStaticText28, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-  m_pwpSymSpin = new wxSpinCtrl( itemDialog1, ID_SPINCTRL8, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
-  m_pwNumSymbox->Add(m_pwpSymSpin, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText30 = new wxStaticText( itemDialog1, wxID_STATIC, wxT(")"), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwNumSymbox->Add(itemStaticText30, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
   m_OwnSymbols = new wxTextCtrl( itemDialog1, IDC_OWNSYMBOLS, wxEmptyString, wxDefaultPosition, wxSize(220, -1), 0 );
   m_pwMinsGSzr->Add(m_OwnSymbols, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
   wxButton* itemButton32 = new wxButton( itemDialog1, ID_RESET_SYMBOLS, _("Reset"), wxDefaultPosition, wxDefaultSize, 0 );
   m_pwMinsGSzr->Add(itemButton32, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5);
-
-  m_pwpEasyCtrl = new wxCheckBox( itemDialog1, ID_CHECKBOX7, _("Use only easy-to-read characters\n(i.e., no 'l', '1', etc.)"), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwpEasyCtrl->SetValue(false);
-  m_pwMinsGSzr->Add(m_pwpEasyCtrl, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
   m_pwMinsGSzr->Add(5, 5, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
@@ -262,13 +197,6 @@ void CPasswordPolicy::CreateControls()
   m_pwMinsGSzr->Add(m_pwpPronounceCtrl, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
   m_pwMinsGSzr->Add(5, 5, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 0);
-
-  wxStaticText* itemStaticText37 = new wxStaticText( itemDialog1, wxID_STATIC, _("Or"), wxDefaultPosition, wxDefaultSize, 0 );
-  itemStaticBoxSizer6->Add(itemStaticText37, 0, wxALIGN_LEFT|wxALL, 5);
-
-  m_pwpHexCtrl = new wxCheckBox( itemDialog1, ID_CHECKBOX9, _("Use hexadecimal digits only (0-9, a-f)"), wxDefaultPosition, wxDefaultSize, 0 );
-  m_pwpHexCtrl->SetValue(false);
-  itemStaticBoxSizer6->Add(m_pwpHexCtrl, 0, wxALIGN_LEFT|wxALL, 5);
 
   wxStdDialogButtonSizer* itemStdDialogButtonSizer39 = new wxStdDialogButtonSizer;
 
@@ -288,17 +216,11 @@ void CPasswordPolicy::CreateControls()
   itemTextCtrl5->SetValidator( wxGenericValidator(& m_polname) );
   itemSpinCtrl9->SetValidator( wxGenericValidator(& m_pwdefaultlength) );
   m_pwpUseLowerCtrl->SetValidator( wxGenericValidator(& m_pwUseLowercase) );
-  m_pwpLCSpin->SetValidator( wxGenericValidator(& m_pwLowerMinLength) );
   m_pwpUseUpperCtrl->SetValidator( wxGenericValidator(& m_pwUseUppercase) );
-  m_pwpUCSpin->SetValidator( wxGenericValidator(& m_pwUpperMinLength) );
   m_pwpUseDigitsCtrl->SetValidator( wxGenericValidator(& m_pwUseDigits) );
-  m_pwpDigSpin->SetValidator( wxGenericValidator(& m_pwDigitMinLength) );
   m_pwpSymCtrl->SetValidator( wxGenericValidator(& m_pwUseSymbols) );
-  m_pwpSymSpin->SetValidator( wxGenericValidator(& m_pwSymbolMinLength) );
   m_OwnSymbols->SetValidator( wxGenericValidator(& m_Symbols) );
-  m_pwpEasyCtrl->SetValidator( wxGenericValidator(& m_pwUseEasyVision) );
   m_pwpPronounceCtrl->SetValidator( wxGenericValidator(& m_pwMakePronounceable) );
-  m_pwpHexCtrl->SetValidator( wxGenericValidator(& m_pwUseHex) );
 ////@end CPasswordPolicy content construction
 }
 
@@ -342,20 +264,9 @@ bool CPasswordPolicy::Verify()
   bool retval = true;
   int id = 0;
 
-  // Check that options, as set, are valid.
-  if (m_pwUseHex &&
-     (m_pwUseLowercase || m_pwUseUppercase || m_pwUseDigits ||
-      m_pwUseSymbols || m_pwUseEasyVision || m_pwMakePronounceable)) {
-    mess = _("Hexadecimal is mutually exculsive to all other options.");
-    retval = false;
-  } else if (m_pwUseHex) {
-    if (m_pwdefaultlength % 2 != 0) {
-      mess = _("Hexadecimal passwords must have even length - each byte is two characters");
-      retval = false;
-    }
-  } else if (!m_pwUseLowercase && !m_pwUseUppercase &&
+  if (!m_pwUseLowercase && !m_pwUseUppercase &&
       !m_pwUseDigits && !m_pwUseSymbols) {
-    mess = _("At least one type of character (lowercase, uppercase, digits, symbols or hexadecimal) must be chosen");
+    mess = _("At least one type of character (lowercase, uppercase, digits, or symbols) must be chosen");
     retval = false;
   }
 
@@ -364,18 +275,6 @@ bool CPasswordPolicy::Verify()
     id = ID_PWLENSB;
     retval = false;
   }
-
-  if (!(m_pwUseHex || m_pwUseEasyVision || m_pwMakePronounceable) &&
-      (m_pwDigitMinLength + m_pwLowerMinLength +
-       m_pwSymbolMinLength + m_pwUpperMinLength) > m_pwdefaultlength) {
-    mess = _("Password length is less than sum of 'at least' constraints");
-    id = ID_PWLENSB;
-    retval = false;
-  }
-
-  if ((m_pwUseHex || m_pwUseEasyVision || m_pwMakePronounceable))
-    m_pwDigitMinLength = m_pwLowerMinLength =
-      m_pwSymbolMinLength = m_pwUpperMinLength = 1;
 
   if (m_polname.IsEmpty()) {
     mess = _("Policy name cannot be blank");
@@ -410,18 +309,10 @@ bool CPasswordPolicy::UpdatePolicy()
       m_st_pp.flags |= PWPolicy::UseDigits;
     if (m_pwUseSymbols == TRUE)
       m_st_pp.flags |= PWPolicy::UseSymbols;
-    if (m_pwUseHex == TRUE)
-      m_st_pp.flags |= PWPolicy::UseHexDigits;
-    if (m_pwUseEasyVision == TRUE)
-      m_st_pp.flags |= PWPolicy::UseEasyVision;
     if (m_pwMakePronounceable == TRUE)
       m_st_pp.flags |= PWPolicy::MakePronounceable;
 
     m_st_pp.length = m_pwdefaultlength;
-    m_st_pp.digitminlength = m_pwDigitMinLength;
-    m_st_pp.lowerminlength = m_pwLowerMinLength;
-    m_st_pp.symbolminlength = m_pwSymbolMinLength;
-    m_st_pp.upperminlength = m_pwUpperMinLength;
     m_st_pp.symbols = m_Symbols.c_str();
     return true;
   }
@@ -484,20 +375,10 @@ void CPasswordPolicy::SetPolicyData(const wxString &polname, const PWPolicy &pol
   m_pwUseSymbols = m_oldpwUseSymbols =
     (pol.flags & PWPolicy::UseSymbols) ==
                        PWPolicy::UseSymbols;
-  m_pwUseHex = m_oldpwUseHex =
-    (pol.flags & PWPolicy::UseHexDigits) ==
-                       PWPolicy::UseHexDigits;
-  m_pwUseEasyVision = m_oldpwUseEasyVision =
-    (pol.flags & PWPolicy::UseEasyVision) ==
-                       PWPolicy::UseEasyVision;
   m_pwMakePronounceable = m_oldpwMakePronounceable =
     (pol.flags & PWPolicy::MakePronounceable) ==
                        PWPolicy::MakePronounceable;
   m_pwdefaultlength = m_oldpwdefaultlength = pol.length;
-  m_pwDigitMinLength = m_oldpwDigitMinLength = pol.digitminlength;
-  m_pwLowerMinLength = m_oldpwLowerMinLength = pol.lowerminlength;
-  m_pwSymbolMinLength = m_oldpwSymbolMinLength = pol.symbolminlength;
-  m_pwUpperMinLength = m_oldpwUpperMinLength = pol.upperminlength;
 
   wxString symbols = pol.symbols.c_str();
   if (symbols.empty())
@@ -523,7 +404,6 @@ void CPasswordPolicy::CBox2Spin(wxCheckBox *cb, wxSpinCtrl *sp)
 
 void CPasswordPolicy::OnPwPolUseLowerCase( wxCommandEvent& )
 {
-  CBox2Spin(m_pwpUseLowerCtrl, m_pwpLCSpin);
 }
 
 
@@ -533,7 +413,6 @@ void CPasswordPolicy::OnPwPolUseLowerCase( wxCommandEvent& )
 
 void CPasswordPolicy::OnPwPolUseUpperCase( wxCommandEvent& )
 {
-  CBox2Spin(m_pwpUseUpperCtrl, m_pwpUCSpin);
 }
 
 
@@ -543,7 +422,6 @@ void CPasswordPolicy::OnPwPolUseUpperCase( wxCommandEvent& )
 
 void CPasswordPolicy::OnPwPolUseDigits( wxCommandEvent& )
 {
-  CBox2Spin(m_pwpUseDigitsCtrl, m_pwpDigSpin);
 }
 
 
@@ -553,7 +431,6 @@ void CPasswordPolicy::OnPwPolUseDigits( wxCommandEvent& )
 
 void CPasswordPolicy::OnPwPolUseSymbols( wxCommandEvent& )
 {
-  CBox2Spin(m_pwpSymCtrl, m_pwpSymSpin);
   bool checked = m_pwpSymCtrl->GetValue();
   m_OwnSymbols->Enable(checked);
   FindWindow(ID_RESET_SYMBOLS)->Enable(checked);
@@ -575,35 +452,6 @@ void CPasswordPolicy::OnResetSymbolsClick( wxCommandEvent& WXUNUSED(event) )
 
 void CPasswordPolicy::OnPronouceableCBClick( wxCommandEvent& event )
 {
-  if (event.IsChecked()) {
-    // Check if ezread is also set - forbid both
-    if (m_pwpEasyCtrl->GetValue()) {
-      m_pwpPronounceCtrl->SetValue(false);
-      wxMessageBox(_("Sorry, \"pronouncable\" and \"easy-to-read\" cannot be both selected"),
-                   _("Error"), wxOK|wxICON_ERROR, this);
-      return;
-    }
-  }
-  if (Validate() && TransferDataFromWindow())
-    SetDefaultSymbolDisplay(false);
-}
-
-
-/*!
- * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX7
- */
-
-void CPasswordPolicy::OnEZreadCBClick( wxCommandEvent& event )
-{
-  if (event.IsChecked()) {
-    // Check if pronounceable is also set - forbid both
-    if (m_pwpPronounceCtrl->GetValue()) {
-      m_pwpEasyCtrl->SetValue(false);
-      wxMessageBox(_("Sorry, \"easy-to-read\" and \"pronouncable\" cannot be both selected"),
-                   _("Error"), wxOK|wxICON_ERROR, this);
-      return;
-    }
-  }
   if (Validate() && TransferDataFromWindow())
     SetDefaultSymbolDisplay(false);
 }

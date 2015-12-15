@@ -184,15 +184,6 @@ public:
   /// wxEVT_COMMAND_COMBOBOX_SELECTED event handler for ID_POLICYLIST
   void OnPolicylistSelected( wxCommandEvent& event );
 
-  /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX3
-  void OnLowercaseCB( wxCommandEvent& event );
-
-  /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX4
-  void OnUppercaseCB( wxCommandEvent& event );
-
-  /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX5
-  void OnDigitsCB( wxCommandEvent& event );
-
   /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX6
   void OnSymbolsCB( wxCommandEvent& event );
 
@@ -202,14 +193,8 @@ public:
   /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_RESET_SYMBOLS
   void OnResetSymbolsClick( wxCommandEvent& event );
 
-  /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX7
-  void OnEZreadCBClick( wxCommandEvent& event );
-
   /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX8
   void OnPronouceableCBClick( wxCommandEvent& event );
-
-  /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX9
-  void OnUseHexCBClick( wxCommandEvent& event );
 
 ////@end AddEditPropSheet event handler declarations
   void OnEZreadOrPronounceable( wxCommandEvent& evt);
@@ -311,21 +296,11 @@ public:
   wxSpinCtrl* m_pwpLenCtrl;
   wxGridSizer* m_pwMinsGSzr;
   wxCheckBox* m_pwpUseLowerCtrl;
-  wxBoxSizer* m_pwNumLCbox;
-  wxSpinCtrl* m_pwpLCSpin;
   wxCheckBox* m_pwpUseUpperCtrl;
-  wxBoxSizer* m_pwNumUCbox;
-  wxSpinCtrl* m_pwpUCSpin;
   wxCheckBox* m_pwpUseDigitsCtrl;
-  wxBoxSizer* m_pwNumDigbox;
-  wxSpinCtrl* m_pwpDigSpin;
   wxCheckBox* m_pwpSymCtrl;
-  wxBoxSizer* m_pwNumSymbox;
-  wxSpinCtrl* m_pwpSymSpin;
   wxTextCtrl* m_ownsymbols;
-  wxCheckBox* m_pwpEasyCtrl;
   wxCheckBox* m_pwpPronounceCtrl;
-  wxCheckBox* m_pwpHexCtrl;
   wxString m_RMTime; // Any field modification time
 private:
   wxString m_ATime; // Access Time
