@@ -436,18 +436,6 @@ void XMLFileHandlers::ProcessEndElement(const int icurrent_element)
       else
         m_cur_entry->pwp.flags &= ~PWPolicy::UseDigits;
       break;
-    case XLE_ENTRY_PWUSEEASYVISION:
-      if (m_sxElemContent == _T("1"))
-        m_cur_entry->pwp.flags |= PWPolicy::UseEasyVision;
-      else
-        m_cur_entry->pwp.flags &= ~PWPolicy::UseEasyVision;
-      break;
-    case XLE_ENTRY_PWUSEHEXDIGITS:
-      if (m_sxElemContent == _T("1"))
-        m_cur_entry->pwp.flags |= PWPolicy::UseHexDigits;
-      else
-        m_cur_entry->pwp.flags &= ~PWPolicy::UseHexDigits;
-      break;
     case XLE_ENTRY_PWUSELOWERCASE:
       if (m_sxElemContent == _T("1"))
         m_cur_entry->pwp.flags |= PWPolicy::UseLowercase;

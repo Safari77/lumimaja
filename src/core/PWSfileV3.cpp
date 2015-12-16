@@ -19,6 +19,7 @@
 #include "os/debug.h"
 #include "os/file.h"
 #include "os/logit.h"
+#include "os/utf8conv.h"
 
 #include "XML/XMLDefs.h"  // Required if testing "USE_XML_LIBRARY"
 
@@ -416,37 +417,69 @@ int PWSfileV3::WriteHeader()
     delete[] buf;
   }
 
-  // Named Policies
   if (!m_MapPSWDPLC.empty()) {
-    oStringXStream oss;
-    oss.fill(charT('0'));
+    size_t numPols = m_MapPSWDPLC.size();
 
-    size_t num = m_MapPSWDPLC.size();
-    if (num > 255)
-      num = 255;  // Do not exceed 2 hex character length field
+    if (numPols > 255)
+      numPols = 255;  // Do not exceed a single byte
 
-    oss << setw(2) << hex << num;
-    PSWDPolicyMapIter iter = m_MapPSWDPLC.begin();
-    for (size_t n = 0; n < num; n++, iter++) {
-      // The Policy name is limited to 255 characters.
-      // This should have been prevented by the GUI.
-      // If not, don't write it out as it may cause issues
-      if (iter->first.length() > 255)
-        continue;
-
-      oss << setw(2) << hex << iter->first.length();
-      oss << iter->first.c_str();
-      StringX strpwp(iter->second);
-      oss << strpwp.c_str();
-      if (iter->second.symbols.empty()) {
-        oss << _T("00");
-      } else {
-        oss << setw(2) << hex << iter->second.symbols.length();
-        oss << iter->second.symbols.c_str();
-      }
+    // Quick iteration to figure out total size
+    PSWDPolicyMapIter iter;
+    size_t totlen = 1; // 1 byte for num of policies
+    for (iter = m_MapPSWDPLC.begin(); iter != m_MapPSWDPLC.end(); iter++) {
+      size_t polNameLen = pws_os::wcstombs(NULL, 0, iter->first.c_str(), iter->first.length());
+      size_t symSetLen = ((iter->second.symbols.empty()) ?
+                          0 : pws_os::wcstombs(NULL, 0, iter->second.symbols.c_str(), iter->second.symbols.length()));
+      totlen +=
+        1 +                            // length of policy name
+        polNameLen +
+        2 +                            // flags
+        2 +                            // password length
+        2 +                            // length of special symbol set
+        symSetLen;
     }
 
-    PWSfile::WriteRaw(HDR_PSWDPOLICIES, StringX(oss.str().c_str()));
+    // Allocate buffer in calculated size
+    unsigned char *buf = new unsigned char[totlen];
+    memset(buf, 0, totlen); // in case we trucate some names, don't leak info.
+
+    // fill buffer
+    buf[0] = (unsigned char)numPols;
+    unsigned char *buf_ptr = buf + 1;
+    for (iter = m_MapPSWDPLC.begin(); iter != m_MapPSWDPLC.end(); iter++) {
+      size_t polNameLen = pws_os::wcstombs(NULL, 0, iter->first.c_str(), iter->first.length());
+      if (polNameLen > 255) // too bad if too long...
+        polNameLen = 255;
+      *buf_ptr++ = (unsigned char)polNameLen;
+      pws_os::wcstombs((char *)buf_ptr, polNameLen, iter->first.c_str(), iter->first.length());
+      buf_ptr += polNameLen;
+
+      const PWPolicy &pwpol = iter->second;
+      putInt16(buf_ptr, pwpol.flags);            buf_ptr += 2;
+      putInt16(buf_ptr, uint16(pwpol.length));   buf_ptr += 2;
+
+      if (pwpol.symbols.empty()) {
+        putInt16(buf_ptr, uint16(0));            buf_ptr += 2;
+      } else {
+        size_t symSetLen = pws_os::wcstombs(NULL, 0,
+                                            pwpol.symbols.c_str(),
+                                            pwpol.symbols.length());
+        if (symSetLen > 65535) // too bad if too long...
+          symSetLen = 65535;
+        putInt16(buf_ptr, uint16(symSetLen));    buf_ptr += 2;
+        pws_os::wcstombs((char *)buf_ptr, symSetLen,
+                         pwpol.symbols.c_str(), pwpol.symbols.length());
+        buf_ptr += symSetLen;
+      }
+    } // for loop over policies
+
+    fprintf(stderr, "WriteRaw HDR_PSWDPOLICIES totlen=%zu delta=%ld\n",
+            totlen, (long)buf_ptr - (intptr_t(buf) + totlen));
+    ASSERT(buf_ptr == buf + totlen); // check our math...
+
+    PWSfile::WriteRaw(HDR_PSWDPOLICIES, buf, totlen);
+    trashMemory(buf, totlen);
+    delete[] buf;
   }
 
   // Empty Groups
@@ -731,20 +764,22 @@ int PWSfileV3::ReadHeader()
 
     case HDR_PSWDPOLICIES:
       {
-        const size_t minPolLen = 1 + 1 + 1 + 2 + 2*5 + 1; // see formatV4.txt
-        if (utf8Len < minPolLen)
+        if (utf8Len < 1 + 1 + 1 + 2 + 2 + 2);
           break; // Error
 
         unsigned char *buf_ptr = utf8;
         const unsigned char *max_ptr = utf8 + utf8Len; // for sanity checks
-        int num = *buf_ptr++;
+        unsigned int num = *buf_ptr++; // policies
+        // HMMMM maybe protobuf, msgpack, ?!
 
         // Get the policies and save them
-        for (int n = 0; n < num; n++) {
+        for (unsigned int n = 0; n < num; n++) {
           StringX sxPolicyName;
           PWPolicy pwp;
 
-          int nameLen = *buf_ptr++;
+          unsigned int nameLen = *buf_ptr++;
+          fprintf(stderr, "HDR_PSWDPOLICIES n=%u num=%u nameLen=%u\n",
+                  n, num, nameLen);
           // need to tack on null byte to name before conversion
           unsigned char *nmbuf = new unsigned char[nameLen + 1];
           memcpy(nmbuf, buf_ptr, nameLen); nmbuf[nameLen] = 0;
@@ -758,17 +793,22 @@ int PWSfileV3::ReadHeader()
           pwp.flags = getInt16(buf_ptr);            buf_ptr += 2;
           pwp.length = getInt16(buf_ptr);           buf_ptr += 2;
           if (buf_ptr > max_ptr)
-            break; // Error
-          int symLen = *buf_ptr++;
+            break;
+          unsigned int symLen = getInt16(buf_ptr);  buf_ptr += 2;
+          fprintf(stderr, "  symLen=%u\n", symLen);
           if (symLen > 0) {
+            if (buf_ptr > max_ptr - symLen) {
+              fprintf(stderr, "  symLen overflow\n");
+              break;
+            }
             // need to tack on null byte to symbols before conversion
             unsigned char *symbuf = new unsigned char[symLen + 1];
             memcpy(symbuf, buf_ptr, symLen); symbuf[symLen] = 0;
             utf8status = m_utf8conv.FromUTF8(symbuf, symLen, pwp.symbols);
             trashMemory(symbuf, symLen); delete[] symbuf;
+            buf_ptr += symLen;
             if (!utf8status)
               continue;
-            buf_ptr += symLen;
           }
           if (buf_ptr > max_ptr)
             break; // Error

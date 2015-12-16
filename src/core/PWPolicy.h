@@ -35,10 +35,8 @@ struct PWPolicy {
     UseUppercase        = 0x4000, // Can have a minimum length field
     UseDigits           = 0x2000, // Can have a minimum length field
     UseSymbols          = 0x1000, // Can have a minimum length field
-    UseHexDigits        = 0x0800,
-    UseEasyVision       = 0x0400,
-    MakePronounceable   = 0x0200,
-    Unused              = 0x01ff};
+    MakePronounceable   = 0x0800,
+    Unused              = 0x07ff};
 
   unsigned short flags; // bitwise-or of the above
   int length;
