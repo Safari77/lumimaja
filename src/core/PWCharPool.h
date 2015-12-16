@@ -41,6 +41,7 @@ public:
   ~CPasswordCharPool();
 
   static bool CheckPassword(const StringX &pwd, StringX &error);
+  static bool CheckPasswordClasses(const StringX &pwd);
   static stringT GetDefaultSymbols();
   static stringT GetPronounceableSymbols() {return pronounceable_symbol_chars;}
   static void ResetDefaultSymbols(); // reset the preference string
@@ -51,7 +52,6 @@ private:
   // select a chartype with weighted probability
   charT GetRandomChar() const;
   StringX MakePronounceable() const;
-  StringX MakeHex() const;
 
   // here are all the character types
   static const charT std_lowercase_chars[];

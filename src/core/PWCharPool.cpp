@@ -113,52 +113,25 @@ StringX CPasswordCharPool::MakePassword() const
   if (m_pronounceable)
     return MakePronounceable();
 
-  StringX password = _T("");
-  for (uint i = 0; i < m_pwlen; i++) {
-      password += GetRandomChar();
-  }
+  StringX password;
+  bool hasalpha, hasdigit;
+  do {
+    hasalpha = !m_uselowercase && !m_useuppercase; // prevent infinite loop
+    hasdigit = !m_usedigits;
+    charT ch;
+
+    password.assign(_T(""));
+    for (uint i = 0; i < m_pwlen; i++) {
+      ch = GetRandomChar();
+      password += ch;
+      if (_istalpha(ch)) hasalpha = true;
+      if (_istdigit(ch)) hasdigit = true;
+    }
+    if (m_pwlen <= 4) break;
+  } while(!hasalpha || !hasdigit);
 
   ASSERT(password.length() == size_t(m_pwlen));
   return password;
-}
-
-static const struct {
-  charT num; charT sym;
-} leets[26] = {
-  {charT('4'), charT('@')}, {charT('8'), charT('&')}, // a, b
-  {0, charT('(')}, {0, 0},                            // c, d
-  {charT('3'), 0}, {0, 0},                            // e, f
-  {charT('6'), 0}, {0, charT('#')},                   // g, h
-  {charT('1'), charT('!')}, {0, 0},                   // i, j
-  {0, 0}, {charT('1'), charT('|')},                   // k, l
-  {0, 0}, {0, 0},                                     // m, n
-  {charT('0'), 0}, {0, 0},                            // o, p
-  {0, 0}, {0, 0},                                     // q, r
-  {charT('5'), charT('$')}, {charT('7'), charT('+')}, // s, t
-  {0, 0}, {0, 0},                                     // u, v
-  {0, 0}, {0, 0},                                     // w, x
-  {0, 0}, {charT('2'), 0}};                           // y, z
-
-class FillSC {
-  // used in for_each to find Substitution Candidates
-  // for "leet" alphabet for pronounceable passwords
-  // with usesymbols and/or usedigits specified
-public:
-  FillSC(vector<int> &sc, bool digits, bool symbols)
-    : m_sc(sc), m_digits(digits), m_symbols(symbols), m_i(0) {}
-
-  void operator()(charT t) {
-    if ((m_digits && leets[t - charT('a')].num != 0) ||
-      (m_symbols &&leets[t - charT('a')].sym != 0))
-      m_sc.push_back(m_i);
-    m_i++;
-  }
-
-private:
-  FillSC& operator=(const FillSC&); // Do not implement
-  vector<int> &m_sc;
-  bool m_digits, m_symbols;
-  int m_i;
 };
 
 StringX CPasswordCharPool::MakePronounceable() const
@@ -250,6 +223,26 @@ StringX CPasswordCharPool::MakePronounceable() const
   return password.c_str();
 }
 
+bool CPasswordCharPool::CheckPasswordClasses(const StringX &pwd)
+{
+  // check for at least one uppercase and lowercase and one (digit or other)
+  bool has_uc = false, has_lc = false, has_digit = false, has_other = false;
+
+  for (size_t i = 0; i < pwd.length(); i++) {
+    charT c = pwd[i];
+    if (_istlower(c)) has_lc = true;
+    else if (_istupper(c)) has_uc = true;
+    else if (_istdigit(c)) has_digit = true;
+    else has_other = true;
+  }
+
+  if (has_uc && has_lc && (has_digit || has_other)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 bool CPasswordCharPool::CheckPassword(const StringX &pwd, StringX &error)
 {
   /**
@@ -266,29 +259,17 @@ bool CPasswordCharPool::CheckPassword(const StringX &pwd, StringX &error)
 
   const size_t SufficientLength = 12;
   const size_t MinLength = 8;
-  const size_t length = pwd.length();
 
-  if (length >= SufficientLength) {
+  if (pwd.length() >= SufficientLength) {
     return true;
   }
 
-  if (length < MinLength) {
+  if (pwd.length() < MinLength) {
     LoadAString(error, IDSC_PASSWORDTOOSHORT);
     return false;
   }
 
-  // check for at least one uppercase and lowercase and one (digit or other)
-  bool has_uc = false, has_lc = false, has_digit = false, has_other = false;
-
-  for (size_t i = 0; i < length; i++) {
-    charT c = pwd[i];
-    if (_istlower(c)) has_lc = true;
-    else if (_istupper(c)) has_uc = true;
-    else if (_istdigit(c)) has_digit = true;
-    else has_other = true;
-  }
-
-  if (has_uc && has_lc && (has_digit || has_other)) {
+  if (CheckPasswordClasses(pwd)) {
     return true;
   } else {
     LoadAString(error, IDSC_PASSWORDPOOR);
