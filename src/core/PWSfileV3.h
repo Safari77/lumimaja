@@ -44,7 +44,9 @@ public:
 
   enum V3_ARGON2 {
     V3_ARGON2_DS = 0,
-    V3_ARGON2_ID
+    V3_ARGON2_ID,
+    V3_ARGON2_D,
+    V3_ARGON2_I
   };
 
   enum V3_AEAD {

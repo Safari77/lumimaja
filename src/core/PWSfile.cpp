@@ -201,7 +201,7 @@ size_t PWSfile::WriteRaw(unsigned char type, const StringX &data)
 }
 
 size_t PWSfile::WriteRaw(unsigned char type, const unsigned char *data,
-                           size_t length)
+                         size_t length)
 {
   if (length > UINT32_MAX) length = UINT32_MAX;
   size_t written = m_rawdata.size();

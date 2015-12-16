@@ -74,8 +74,8 @@ PWPolicy::operator StringX() const
     return retval;
   }
   ostringstreamT os;
-  unsigned int f; // dain bramaged istringstream requires this runaround
-  f = static_cast<unsigned int>(flags);
+  uint32 f; // dain bramaged istringstream requires this runaround
+  f = static_cast<uint32>(flags);
   os.fill(charT('0'));
   os << std::hex << std::setw(4) << f
      << std::setw(3) << length;

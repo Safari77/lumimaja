@@ -61,7 +61,9 @@ typedef struct {
 // not overengineering at all
 static argon2funmap argon2funmaps[256] = {
   [PWSfileV3::V3_ARGON2_DS] = { &Argon2ds, "ds" },
-  [PWSfileV3::V3_ARGON2_ID] = { &Argon2id, "id" }
+  [PWSfileV3::V3_ARGON2_ID] = { &Argon2id, "id" },
+  [PWSfileV3::V3_ARGON2_D] = { &Argon2d, "d" },
+  [PWSfileV3::V3_ARGON2_I] = { &Argon2i, "i" }
 };
 
 bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *taghdr, unsigned char *out, size_t outlen,

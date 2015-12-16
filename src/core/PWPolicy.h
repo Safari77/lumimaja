@@ -23,11 +23,8 @@ enum {DEFAULT_SYMBOLS = 0, OWN_SYMBOLS = 1}; // TBD - try to eliminate, as this 
  * - The length of the password to be generated
  * - Which type of characters to use from the following: lowercase, uppercase,
  *   digits, symbols
- * - Whether or not to restrict the generated password to hexadecimal (candidate for removal?)
- * - Whether or not to use only characters that are easily distinguishable
- *   (i.e., no '1', 'l', 'I', etc.)
  * - Whether or not to make a password that's pronounceable (and hence easier to memorize)
- *
+ * - If you want only hex chars, put a-f0-9 into symbols.
  */
 struct PWPolicy {
   enum {
@@ -38,8 +35,8 @@ struct PWPolicy {
     MakePronounceable   = 0x0800,
     Unused              = 0x07ff};
 
-  unsigned short flags; // bitwise-or of the above
-  int length;
+  uint16 flags; // bitwise-or of the above
+  uint32 length;
   StringX symbols; // policy-specific set of 'symbol' characters
   size_t usecount; // how many entries use this policy?
 
