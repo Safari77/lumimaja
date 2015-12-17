@@ -84,6 +84,34 @@ void ConvertString(const StringX &text,
   txt[len] = '\0';
 }
 
+bool ConvertStringNFC(const StringX &text,
+                      unsigned char *&txt,
+                      size_t &txtlen)
+{
+  LPCTSTR txtstr = text.c_str();
+  txtlen = text.length();
+  bool replaced = false;
+  char *mbtxt;
+  mbstate_t mbs = {0};
+
+  size_t len = wcsrtombs(NULL, &txtstr, 0, &mbs);
+  if (len == (size_t)-1) {
+    txtlen = 0;
+    return false;
+  }
+  mbtxt = new char[len + 1];
+  len = wcsrtombs(reinterpret_cast<char *>(mbtxt), &txtstr, len, &mbs);
+  mbtxt[len] = '\0';
+  std::string u8tmp = mbtxt;
+  delete[] mbtxt;
+  std::string tonfc(miniutf::nfc(u8tmp, &replaced));
+  txtlen = tonfc.length();
+  txt = new unsigned char[txtlen + 1];
+  memcpy(txt, tonfc.c_str(), txtlen);
+  txt[txtlen] = '\0';
+  return true;
+}
+
 // PWSUtil implementations
 
 void PWSUtil::strCopy(LPTSTR target, size_t tcount, const LPCTSTR source, size_t scount)

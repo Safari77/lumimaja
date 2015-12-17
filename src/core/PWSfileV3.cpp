@@ -71,7 +71,7 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
 {
   size_t passLen = 0;
   unsigned char *pstr = NULL;
-  ConvertString(passkey, pstr, passLen);
+  ConvertStringNFC(passkey, pstr, passLen);
   struct TAGHDR copytag = *taghdr;
   argon2funmap muchfun = argon2funmaps[copytag.Argon2Type];
   int aret;

@@ -14,6 +14,7 @@
 #include "StringX.h"
 #include "PwsPlatform.h"
 #include "UTF8Conv.h"
+#include "miniutf.hpp"
 
 #include "../os/debug.h"
 #include "../os/typedefs.h"
@@ -46,6 +47,11 @@ extern void trashMemory(LPTSTR buffer, size_t length);
 
 extern void ConvertString(const StringX &text,
                           unsigned char *&txt, size_t &txtlen);
+// Do Unicode NFC normalization
+// On error returns false and does not write any string to txt
+extern bool ConvertStringNFC(const StringX &text,
+                             unsigned char *&txt,
+                             size_t &txtlen);
 
 /*
 * Get an integer that is stored in little-endian format not assuming any alignments

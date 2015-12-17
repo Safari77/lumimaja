@@ -163,6 +163,8 @@ list(APPEND LUMIMAJA_HDRS
     src/core/PWStime.h
     src/core/Command.h
     src/core/CommandInterface.h
+    src/core/miniutf.hpp
+    src/core/miniutfdata.h
     src/core/XML/Xerces/XFileSAX2Handlers.h
     src/core/XML/Xerces/XFileValidator.h
     src/core/XML/Xerces/XFileXMLProcessor.h
@@ -280,6 +282,7 @@ list(APPEND LUMIMAJA_SRCS
     src/core/CoreOtherDB.cpp
     src/core/pugixml/pugixml.cpp
     src/core/ItemField.cpp
+    src/core/miniutf.cpp
     src/core/XML/Xerces/XFileSAX2Handlers.cpp
     src/core/XML/Xerces/XFileValidator.cpp
     src/core/XML/Xerces/XFileXMLProcessor.cpp
