@@ -71,11 +71,15 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
 {
   size_t passLen = 0;
   unsigned char *pstr = NULL;
-  ConvertStringNFC(passkey, pstr, passLen);
   struct TAGHDR copytag = *taghdr;
   argon2funmap muchfun = argon2funmaps[copytag.Argon2Type];
   int aret;
 
+  if (!ConvertStringNFC(passkey, pstr, passLen)) {
+    fprintf(stderr, "ConvertStringNFC failed\n");
+    return false;
+  }
+  
   if (muchfun.f == NULL) {
     fprintf(stderr, "Argon2 error: unsupported type %u\n", copytag.Argon2Type);
     return false;
