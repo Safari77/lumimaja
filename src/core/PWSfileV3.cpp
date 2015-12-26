@@ -274,7 +274,6 @@ int PWSfileV3::ReadRecord(CItemData &item)
 {
   ASSERT(m_fd != NULL);
   ASSERT(m_curversion == V30);
-  fprintf(stderr, "PWSfileV3::ReadRecord\n");
   return item.Read(this);
 }
 

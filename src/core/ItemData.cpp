@@ -178,7 +178,6 @@ int CItemData::Write(PWSfile *out) const
 
   ASSERT(IsUUIDSet());
   GetUUID(item_uuid);
-  fprintf(stderr, "CItemData::Write\n");
   out->WriteRaw(UUID, item_uuid, sizeof(uuid_array_t));
 
   for (i = 0; TextFields[i] != END; i++)

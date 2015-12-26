@@ -210,8 +210,10 @@ size_t PWSfile::WriteRaw(unsigned char type, const unsigned char *data,
   if (length)
     m_rawdata.insert(m_rawdata.end(), data, data+length);
   written = m_rawdata.size() - written;
+#ifdef DEBUG
   fprintf(stderr, "PWSfileV3::WriteRaw type=%u len=%zu written=%zu totsize=%zu\n",
           type, length, written, m_rawdata.size());
+#endif
   return written;
 }
 
@@ -220,20 +222,19 @@ size_t PWSfile::ReadRaw(unsigned char &type, unsigned char* &data,
 {
   uint32 u32;
 
+#ifdef DEBUG
   fprintf(stderr, "PWSfileV3::ReadRaw sz=%zu m_rawpos=%zu\n",
           m_rawdata.size(), m_rawpos);
+#endif
   if (m_rawpos >= m_rawdata.size()) {
-    fprintf(stderr, "... EOF 1\n");
     return 0;
   }
   type = m_rawdata.at(m_rawpos++);
   if (m_rawpos > m_rawdata.size() - 4) {
-    fprintf(stderr, "... EOF 2\n");
     return 0;
   }
   u32 = vec_pull32(m_rawdata, m_rawpos);
   if ((u32 + m_rawpos > m_rawdata.size())) {
-      fprintf(stderr, "... EOF 3\n");
       return 0;
   }
   length = u32;
@@ -241,8 +242,10 @@ size_t PWSfile::ReadRaw(unsigned char &type, unsigned char* &data,
   data = new unsigned char[u32+1]; // for extra char after utf8 string
   memcpy(data, &m_rawdata[m_rawpos], u32);
   m_rawpos += u32;
+#ifdef DEBUG
   fprintf(stderr, "... type=%u len=%zu m_rawpos=%zu\n",
           type, length, m_rawpos);
+#endif
 
   return 1 + 4 + u32;
 }
