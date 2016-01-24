@@ -107,9 +107,6 @@ public:
   wxString GetNumentries() const { return m_numentries ; }
   void SetNumentries(wxString value) { m_numentries = value ; }
 
-  wxString GetRawsize() const { return m_rawsize ; }
-  void SetRawsize(wxString value) { m_rawsize = value ; }
-
   wxString GetWhenlastsaved() const { return m_whenlastsaved ; }
   void SetWhenlastsaved(wxString value) { m_whenlastsaved = value ; }
 

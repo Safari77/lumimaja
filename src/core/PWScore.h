@@ -484,8 +484,6 @@ public:
   uint32 GetHashMemKiB() const;
   void SetHashPasses(uint32 value);
   void SetHashMemKiB(uint32 value);
-  size_t GetRawdatasize() const;
-  void SetRawdatasize(size_t value);
 
   const std::string& GetReturnValueString(int ret);
 

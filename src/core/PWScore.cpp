@@ -3319,15 +3319,3 @@ void PWScore::SetHashPasses(uint32 value)
   }
 }
 
-size_t PWScore::GetRawdatasize() const
-{
-  fprintf(stderr, "PWScore::GetRawdatasize %zu\n", m_rawdatasize);
-  return m_rawdatasize;
-}
-
-void PWScore::SetRawdatasize(size_t sz)
-{
-  fprintf(stderr, "PWScore::SetRawdatasize %zu\n", sz);
-  m_rawdatasize = sz;
-}
-

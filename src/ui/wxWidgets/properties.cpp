@@ -118,7 +118,6 @@ void CProperties::Init()
   m_numgroups << aryGroups.size();
 
   m_numentries << m_core.GetNumEntries();
-  m_rawsize << m_core.GetRawdatasize();
 
   time_t twls = m_core.GetHeader().m_whenlastsaved;
   if (twls == 0) {
@@ -204,9 +203,6 @@ void CProperties::CreateControls()
   wxStaticText* itemStaticText8 = new wxStaticText( currDialog, wxID_STATIC, _("Number of Entries:"), wxDefaultPosition, wxDefaultSize, 0 );
   staticVertSizer->Add(itemStaticText8, 0, wxALIGN_LEFT|wxALL, 5);
 
-  wxStaticText* itemStaticText9 = new wxStaticText( currDialog, wxID_STATIC, _("Size of raw data:"), wxDefaultPosition, wxDefaultSize, 0 );
-  staticVertSizer->Add(itemStaticText9, 0, wxALIGN_LEFT|wxALL, 5);
-
   wxStaticText* itemStaticText10 = new wxStaticText( currDialog, wxID_STATIC, _("Last saved by:"), wxDefaultPosition, wxDefaultSize, 0 );
   staticVertSizer->Add(itemStaticText10, 0, wxALIGN_LEFT|wxALL, 5);
 
@@ -233,9 +229,6 @@ void CProperties::CreateControls()
 
   wxStaticText* entriesText = new wxStaticText( currDialog, wxID_NUMENTRIES, wxT("999"), wxDefaultPosition, wxDefaultSize, 0 );
   dataVertSizer->Add(entriesText, 0, wxALIGN_LEFT|wxALL, 5);
-
-  wxStaticText* rawsizeText = new wxStaticText( currDialog, wxID_NUMENTRIES, wxT("999"), wxDefaultPosition, wxDefaultSize, 0 );
-  dataVertSizer->Add(rawsizeText, 0, wxALIGN_LEFT|wxALL, 5);
 
   wxStaticText* lastSavedUserText = new wxStaticText( currDialog, wxID_WHOLASTSAVED, wxT("user on host"), wxDefaultPosition, wxDefaultSize, 0 );
   dataVertSizer->Add(lastSavedUserText, 0, wxALIGN_LEFT|wxALL, 5);
@@ -267,7 +260,6 @@ void CProperties::CreateControls()
   dbFormatText->SetValidator( wxGenericValidator(& m_databaseformat) );
   numGroupsText->SetValidator( wxGenericValidator(& m_numgroups) );
   entriesText->SetValidator( wxGenericValidator(& m_numentries) );
-  rawsizeText->SetValidator( wxGenericValidator(& m_rawsize ) );
   lastSavedUserText->SetValidator( wxGenericValidator(& m_wholastsaved) );
   lastSavedDateText->SetValidator( wxGenericValidator(& m_whenlastsaved) );
   lastSavedAppText->SetValidator( wxGenericValidator(& m_whatlastsaved) );
