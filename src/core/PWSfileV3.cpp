@@ -769,7 +769,7 @@ int PWSfileV3::ReadHeader()
 
     case HDR_PSWDPOLICIES:
       {
-        if (utf8Len < 1 + 1 + 1 + 2 + 2 + 2);
+        if (utf8Len < 1 + 1 + 1 + 2 + 2 + 2)
           break; // Error
 
         unsigned char *buf_ptr = utf8;
