@@ -164,7 +164,7 @@ public:
   void OnKeepHistoryClick( wxCommandEvent& event );
 
   /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_RADIOBUTTON
-  void OnExpRadiobuttonSelected( wxCommandEvent& event );
+  void OnRadiobuttonSelected( wxCommandEvent& event );
 
   /// wxEVT_DATE_CHANGED event handler for ID_DATECTRL
   void OnExpDateChanged( wxDateEvent& event );
@@ -330,8 +330,7 @@ private:
   CItemData m_item;
   void ItemFieldsToPropSheet();
   void SetupDCAComboBoxes(wxComboBox *pcbox, short &iDCA, bool isShift);
-  void UpdateExpTimes(); // entry -> controls
-  void SetXTime(wxObject *src); // sync controls + controls -> entry
+  void SetXTime(wxObject *src);
   void UpdatePWPolicyControls(const PWPolicy& pwp);
   void EnablePWPolicyControls(bool enable);
   PWPolicy GetPWPolicyFromUI();
