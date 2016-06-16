@@ -560,7 +560,6 @@ private:
   static unsigned char m_session_key[crypto_stream_chacha20_KEYBYTES];
   static unsigned char m_session_initialized;
 
-  size_t m_rawdatasize;
   HANDLE m_lockFileHandle;
   HANDLE m_lockFileHandle2;
   int m_LockCount;
