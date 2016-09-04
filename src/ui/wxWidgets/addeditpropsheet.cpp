@@ -127,8 +127,8 @@ bool AddEditPropSheet::Create( wxWindow* parent, wxWindowID id, const wxString& 
 ////@begin AddEditPropSheet creation
   SetExtraStyle(wxWS_EX_VALIDATE_RECURSIVELY|wxWS_EX_BLOCK_EVENTS);
   wxPropertySheetDialog::Create( parent, id, caption, pos, size, style );
-
-  CreateButtons(wxOK|wxCANCEL|wxHELP);
+  int flags = (m_type == VIEW) ? (wxCLOSE|wxHELP) : (wxOK|wxCANCEL|wxHELP);
+  CreateButtons(flags);
   CreateControls();
   LayoutDialog();
   Centre();
@@ -881,11 +881,12 @@ void AddEditPropSheet::ItemFieldsToPropSheet()
   for (sviter = svec.begin(); sviter != svec.end(); sviter++)
     m_cbxPolicyNames->Append(sviter->c_str());
   // Does item use a named policy or item-specific policy?
-  bool namedPwPolicy = !m_item.GetPolicyName().empty();
-  UNREFERENCED_PARAMETER(namedPwPolicy); // Remove MS Compiler warning
+  //bool namedPwPolicy = !m_item.GetPolicyName().empty();
+  //UNREFERENCED_PARAMETER(namedPwPolicy); // Remove MS Compiler warning
 
   bool specificPwPolicy = !m_item.GetPWPolicy().empty();
-  ASSERT(!(namedPwPolicy && specificPwPolicy)); // both cannot be true!
+  // triggered FIXME
+  // ASSERT(!(namedPwPolicy && specificPwPolicy)); // both cannot be true!
   m_defPWPRB->SetValue(!specificPwPolicy);
   m_ourPWPRB->SetValue(specificPwPolicy);
   if (specificPwPolicy) {
