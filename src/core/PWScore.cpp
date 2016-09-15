@@ -1155,6 +1155,7 @@ void PWScore::ChangePasskey(const StringX &newPasskey)
 {
   SetPassKey(newPasskey);
   SetDBChanged(true);
+  WriteCurFile(); // Save immediately!
 }
 
 // functor object type for find_if:
