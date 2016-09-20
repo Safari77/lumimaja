@@ -20,9 +20,9 @@ Yubikey support (ykpers) is autodetected,
   "cmake -D NO_YUBI=1"
 to disable it.
 
-Argon2ds and Argon2id can be used as KDF, please read Argon2 spec what they mean.
-Argon2 specification can still change, I don't add compatibility code
-for Lumimaja if it does.
+For new databases, Argon2_d version 1.3 is used.
+For backwards compatibility lumimaja supports reading version 1.0 databases
+with Argon2_d/Argon2_i types.
 
 Lumimaja? My Finnish translation for "Snowden".
 
