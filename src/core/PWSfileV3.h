@@ -43,10 +43,13 @@ public:
     HDR_END                   = 0xff};    // header field types, per formatV{2,3}.txt
 
   enum V3_ARGON2 {
-    V3_ARGON2_DS = 0,
-    V3_ARGON2_ID,
-    V3_ARGON2_D,
-    V3_ARGON2_I
+    V3_ARGON2_DS10 = 0,
+    V3_ARGON2_ID10,
+    V3_ARGON2_D10,
+    V3_ARGON2_I10,
+
+    V3_ARGON2_D13,
+    V3_ARGON2_I13
   };
 
   enum V3_AEAD {

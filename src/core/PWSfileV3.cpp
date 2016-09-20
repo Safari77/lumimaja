@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <iomanip>
 #include <unistd.h>
-#include <argon2.h>
+#include "external/argon2/include/argon2.h"
 
 using namespace std;
 using pws_os::CUUID;
@@ -48,22 +48,22 @@ PWSfileV3::PWSfileV3(const StringX &filename, RWmode mode, VERSION version)
 
 PWSfileV3::~PWSfileV3()
 {
-  fprintf(stderr, "bye PWSfileV3 %p\n", this);
 }
 
-typedef int (*argon2fun)(Argon2_Context*);
-
 typedef struct {
-  argon2fun f;
-  uint8_t name[3];
+  argon2_type type;
+  uint32_t version;
+  uint8_t name[8];
 } argon2funmap;
 
 // not overengineering at all
 static argon2funmap argon2funmaps[256] = {
-  [PWSfileV3::V3_ARGON2_DS] = { &Argon2ds, "ds" },
-  [PWSfileV3::V3_ARGON2_ID] = { &Argon2id, "id" },
-  [PWSfileV3::V3_ARGON2_D] = { &Argon2d, "d" },
-  [PWSfileV3::V3_ARGON2_I] = { &Argon2i, "i" }
+  [PWSfileV3::V3_ARGON2_DS10] = { argon2_type(255), ARGON2_VERSION_10, "ds_v10" },
+  [PWSfileV3::V3_ARGON2_ID10] = { argon2_type(255), ARGON2_VERSION_10, "id_v10" },
+  [PWSfileV3::V3_ARGON2_D10] = { Argon2_d,   ARGON2_VERSION_10, "d_v10" },
+  [PWSfileV3::V3_ARGON2_I10] = { Argon2_i,   ARGON2_VERSION_10, "i_v10" },
+  [PWSfileV3::V3_ARGON2_D13] = { Argon2_d,   ARGON2_VERSION_13, "d_v13" },
+  [PWSfileV3::V3_ARGON2_I13] = { Argon2_i,   ARGON2_VERSION_13, "i_v13" },
 };
 
 bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *taghdr, unsigned char *out, size_t outlen,
@@ -80,26 +80,49 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
     return false;
   }
   
-  if (muchfun.f == NULL) {
+  if (muchfun.type == 255) {
     fprintf(stderr, "Argon2 error: unsupported type %u\n", copytag.Argon2Type);
     return false;
   }
-  /* password and ad are cleared by Argon2 */
-  fprintf(stderr, "Argon2%s outlen=%zu passlen=%zu saltlen=%zu t_cost=%u m_cost=%u nLanes=%u starting...",
-          muchfun.name, outlen, passLen, saltlen, t_cost, m_cost, nLanes);
-  Argon2_Context ctx(out, outlen, pstr, passLen, salt, saltlen,
-                 /* ad */ reinterpret_cast<unsigned char*>(&copytag), sizeof(copytag),
-                 /* secret */ NULL, 0,
-                 t_cost, m_cost, nLanes, nLanes,
-                 NULL, NULL, true, false, true, false);
-  aret = (*muchfun.f)(&ctx);
-  delete[] pstr;
-  fprintf(stderr, " done\n");
-  if (aret != ARGON2_OK) {
-    fprintf(stderr, "Argon2 error: %s\n", ErrorMessage(aret));
-    return false;
+  /* password is cleared by Argon2 */
+  fprintf(stderr, "Argon2%s version=%u outlen=%zu passlen=%zu saltlen=%zu t_cost=%u m_cost=%u nLanes=%u starting...",
+          muchfun.name, muchfun.version, outlen, passLen, saltlen, t_cost, m_cost, nLanes);
+  argon2_context ctx;
+  ctx.out = out;
+  ctx.outlen = uint32_t(outlen);
+  ctx.pwd = pstr;
+  ctx.pwdlen = uint32_t(passLen);
+  ctx.salt = salt;
+  ctx.saltlen = uint32_t(saltlen);
+  if (muchfun.version == ARGON2_VERSION_10) {
+    ctx.secret = reinterpret_cast<unsigned char*>(&copytag);
+    ctx.secretlen = sizeof(copytag);
+    ctx.ad = NULL;
+    ctx.adlen = 0;
+  } else {
+    ctx.ad = reinterpret_cast<unsigned char*>(&copytag);
+    ctx.adlen = sizeof(copytag);
+    ctx.secret = NULL;
+    ctx.secretlen = 0;
   }
-  return true;
+  ctx.t_cost = t_cost;
+  ctx.m_cost = m_cost;
+  ctx.lanes = nLanes;
+  ctx.threads = nLanes;
+  ctx.version = muchfun.version;
+  ctx.allocate_cbk = NULL;
+  ctx.free_cbk = NULL;
+  ctx.flags = ARGON2_FLAG_CLEAR_PASSWORD | ARGON2_FLAG_CLEAR_MEMORY;
+  aret = argon2_ctx(&ctx, muchfun.type);
+  delete[] pstr;
+
+  if (aret != ARGON2_OK) {
+    fprintf(stderr, " error: %s\n", argon2_error_message(aret));
+    return false;
+  } else {
+    fprintf(stderr, " OK\n");
+    return true;
+  }
 }
 
 int PWSfileV3::Open(const StringX &passkey)
@@ -299,7 +322,7 @@ int PWSfileV3::WriteHeader()
   uint32 nLanes = nProcs;
 
   memcpy(hdr.taghdr.tag, V3TAG, TAGHDR::V3TAGLEN);
-  hdr.taghdr.Argon2Type = V3_ARGON2_DS; // XXX make configurable
+  hdr.taghdr.Argon2Type = V3_ARGON2_D13; // XXX make configurable
   hdr.taghdr.AEAD = V3_AEAD_CHACHA20POLY1305;
   hdr.taghdr.Hash = V3_HASH_BLAKE2B;
   PWSrand::GetInstance()->GetRandomData(hdr.salt, sizeof(hdr.salt));

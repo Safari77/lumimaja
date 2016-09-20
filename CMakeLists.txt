@@ -30,9 +30,12 @@ include(FindXercesC)
 find_package(XercesC REQUIRED)
 include_directories( ${XercesC_INCLUDE_DIR} )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -DUSE_XML_LIBRARY=XERCES -DWCHAR_INCOMPATIBLE_XMLCH ${CMAKE_WXWINDOWS_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DUSE_XML_LIBRARY=XERCES -DWCHAR_INCOMPATIBLE_XMLCH ${CMAKE_WXWINDOWS_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -DDEBUG -gdwarf-4 -O0 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fPIE -D_FORTIFY_SOURCE=2 -fstack-protector-strong")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -D_FORTIFY_SOURCE=2 -fstack-protector-strong")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
 if(NOT HAVE_YKPERS_H)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_YUBI")
@@ -49,29 +52,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src"
   "${PROJECT_SOURCE_DIR}/src/core"
   "${PROJECT_SOURCE_DIR}/src/ui/wxWidgets")
 
-set(CMAKE_REQUIRED_LIBRARIES sodium argon2)
-CHECK_CXX_SOURCE_COMPILES("
-#include <string.h>
-#include <argon2.h>
-#include <iostream>
-
-int main(int argc, char *argv[])
-{
-  unsigned char out[32];
-  unsigned char salt[32] = {1, 2 };
-  int ret;
-  Argon2_Context ctx(out, sizeof(out), reinterpret_cast<uint8_t*>(argv[0]), strlen(argv[0]),
-                     salt, sizeof(salt), NULL, 0, NULL, 0,
-                     1, 1024, 4, 4,
-                     NULL, NULL, true, false, true, false);
-  ret = Argon2d(&ctx);
-  if (ret != ARGON2_OK) {
-    std::cout << \"FAIL\" << std::endl;
-    return 1;
-  }
-  return 0;
-}
-" HAVE_ARGON2_H)
+set(CMAKE_REQUIRED_LIBRARIES sodium)
 
 CHECK_CXX_SOURCE_COMPILES("
 #include <sys/prctl.h>
@@ -85,10 +66,6 @@ CHECK_CXX_SOURCE_COMPILES("
 int main() { ptrace(PT_DENY_ATTACH, 0, 0, 0); return 0; }
 " HAVE_PT_DENY_ATTACH)
 endif()
-
-if(NOT HAVE_ARGON2_H)
-  message(FATAL_ERROR "Please install Argon2 from https://github.com/khovratovich/Argon2.git , directory Source/C++11" )
-endif(NOT HAVE_ARGON2_H)
 
 if(NOT HAVE_SODIUM_H)
   message(FATAL_ERROR "Please install libsodium from https://github.com/jedisct1/libsodium" )
@@ -248,6 +225,12 @@ list(APPEND LUMIMAJA_HDRS
     src/ui/wxWidgets/safecombinationprompt.h
     src/ui/wxWidgets/TimedTaskChain.h
     src/core/core_st.h
+    src/core/argon2/argon2.h
+    src/core/argon2/core.h
+    src/core/argon2/encoding.h
+    src/core/argon2/opt.h
+    src/core/argon2/thread.h
+    src/core/argon2/blake2/blake2.h
 )
 
 
@@ -357,6 +340,12 @@ list(APPEND LUMIMAJA_SRCS
     src/ui/wxWidgets/SizeRestrictedPanel.cpp
     src/ui/wxWidgets/TimedTaskChain.cpp
     src/core/core_st.cpp
+    src/core/argon2/argon2.c
+    src/core/argon2/core.c
+    src/core/argon2/encoding.c
+    src/core/argon2/opt.c
+    src/core/argon2/thread.c
+    src/core/argon2/blake2/blake2b.c
 )
 
 #add_custom_command(
