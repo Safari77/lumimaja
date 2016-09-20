@@ -57,8 +57,6 @@ typedef struct {
 
 // not overengineering at all
 static argon2funmap argon2funmaps[256] = {
-  [PWSfileV3::V3_ARGON2_DS10] = { argon2_type(255), ARGON2_VERSION_10, "ds_v10" },
-  [PWSfileV3::V3_ARGON2_ID10] = { argon2_type(255), ARGON2_VERSION_10, "id_v10" },
   [PWSfileV3::V3_ARGON2_D10] = { Argon2_d,   ARGON2_VERSION_10, "d_v10" },
   [PWSfileV3::V3_ARGON2_I10] = { Argon2_i,   ARGON2_VERSION_10, "i_v10" },
   [PWSfileV3::V3_ARGON2_D13] = { Argon2_d,   ARGON2_VERSION_13, "d_v13" },
@@ -79,7 +77,7 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
     return false;
   }
   
-  if (muchfun.type == 255) {
+  if (muchfun.version == 0) {
     fprintf(stderr, "Argon2 error: unsupported type %u\n", copytag.Argon2Type);
     return false;
   }
