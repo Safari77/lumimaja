@@ -15,7 +15,7 @@
 
 #include <stdio.h> // for FILE *
 #include <vector>
-#include "external/argon2/include/argon2.h"
+#include "argon2/argon2.h"
 
 #include "ItemData.h"
 #include "os/UUID.h"
