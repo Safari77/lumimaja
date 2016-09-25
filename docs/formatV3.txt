@@ -46,8 +46,13 @@ Where:
 quick way for the application to identify the database as a Lumimaja
 version 3 file. This tag has no cryptographic value.
 
-2.2 ARGON2TYPE is one-byte identifier for Argon2 function used (Argon2ds or
-Argon2id)
+2.2 ARGON2TYPE is one-byte identifier for Argon2 function used:
+    0x00 Argon2_ds v1.0 (deprecated)
+    0x01 Argon2_id v1.0 (deprecated)
+    0x02 Argon2_d v1.0
+    0x03 Argon2_i v1.0
+    0x04 Argon2_d v1.3
+    0x05 Argon2_i v1.3
 
 2.3 AEAD is one-byte identifier for AEAD used.
 
