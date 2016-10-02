@@ -44,9 +44,11 @@ bool pws_os::GetRandomData(void *p, unsigned long len)
     ret = syscall(SYS_getrandom, p, len, 0, 0, 0, 0);
   } while ((ret == -1) && (errno == EINTR));
   if (ret == len) return true;
-  fprintf(stderr, "pws_os::GetRandomData getrandom failed: %s\n",
-          strerror(errno));
-  exit(1);
+  if ((ret == -1) && (errno != ENOSYS)) {
+    fprintf(stderr, "pws_os::GetRandomData getrandom failed: %s\n",
+            strerror(errno));
+    exit(1);
+  }
 #else
 #  warning getrandom not supported
 #endif
