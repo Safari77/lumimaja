@@ -65,8 +65,9 @@ static bool isFileUnicode(const stringT &fname)
   if (pws_os::fileLength(fn) < 2)
     retval = false;
   else {
-    fread(buffer, 1, 2, fn);
-    retval = (buffer[0] == BOM[0] && buffer[1] == BOM[1]);
+    if (fread(buffer, 1, 2, fn) == 2) {
+      retval = (buffer[0] == BOM[0] && buffer[1] == BOM[1]);
+    }
   }
   fclose(fn);
   return retval;
