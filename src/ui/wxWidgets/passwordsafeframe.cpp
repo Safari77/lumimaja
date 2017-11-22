@@ -62,6 +62,7 @@
 #include "../../core/core.h"
 #include "../../core/PWScore.h"
 #include "./SelectionCriteria.h"
+#include "pwsqrcodedlg.h"
 
 // main toolbar images
 #include "./PwsToolbarButtons.h"
@@ -175,6 +176,8 @@ BEGIN_EVENT_TABLE( PasswordSafeFrame, wxFrame )
   EVT_MENU( ID_CREATESHORTCUT, PasswordSafeFrame::OnCreateShortcut )
 
   EVT_MENU( ID_DUPLICATEENTRY, PasswordSafeFrame::OnDuplicateEntry )
+
+  EVT_MENU( ID_PASSWORDQRCODE, PasswordSafeFrame::OnPasswordQRCode )
 
   EVT_MENU( ID_IMPORT_PLAINTEXT, PasswordSafeFrame::OnImportText )
 
@@ -1849,6 +1852,9 @@ void PasswordSafeFrame::OnContextMenu(const CItemData* item)
     itemEditMenu.Append(ID_COPYUSERNAME,   _("Copy &Username to Clipboard"));
     itemEditMenu.Append(ID_COPYPASSWORD,   _("&Copy Password to Clipboard"));
     itemEditMenu.Append(ID_PASSWORDSUBSET, _("Display subset of Password"));
+    if (HasQRCode()) {
+      itemEditMenu.Append(ID_PASSWORDQRCODE, _("Display Password as &QR code"));
+    }
     itemEditMenu.Append(ID_COPYNOTESFLD,   _("Copy &Notes to Clipboard"));
     itemEditMenu.Append(ID_COPYURL,        _("Copy UR&L to Clipboard"));
     itemEditMenu.Append(ID_COPYEMAIL,      _("Copy email to Clipboard"));
@@ -2004,6 +2010,7 @@ void PasswordSafeFrame::OnUpdateUI(wxUpdateUIEvent& evt)
     case ID_AUTOTYPE:
     case ID_EDIT:
     case ID_PASSWORDSUBSET:
+    case ID_PASSWORDQRCODE:
       // not allowed if a group is selected in tree view
       evt.Enable(m_currentView == GRID || GetSelectedEntry() != NULL );
       break;

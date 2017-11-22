@@ -36,6 +36,7 @@
 #include "createshortcutdlg.h"
 #include "wxutils.h"
 #include "guiinfo.h"
+#include "pwsqrcodedlg.h"
 
 #include "../../core/PWSAuxParse.h"
 #include "../../core/Util.h"
@@ -847,3 +848,22 @@ void PasswordSafeFrame::OnRedo(wxCommandEvent& evt)
 //  SaveGUIStatus();
   m_core.Redo();
 }
+
+void PasswordSafeFrame::OnPasswordQRCode(wxCommandEvent& evt)
+{
+  if ( /* constexpr */ HasQRCode() ) {
+    CItemData rueItem;
+    CItemData* item = IsRUEEvent(evt)? (m_RUEList.GetPWEntry(GetEventRUEIndex(evt), rueItem)? &rueItem: NULL) : GetSelectedEntry(); 
+    if (item != NULL) {
+#ifndef NO_QR
+    PWSQRCodeDlg dlg(this, item->GetPassword(),
+              towxstring(CItemData::FieldName(CItemData::PASSWORD)) + _T(" of ") +
+              towxstring(item->GetGroup()) +
+              _T('[') + towxstring(item->GetTitle()) + _T(']') +
+              _T(':') + towxstring(item->GetUser()));
+      dlg.ShowModal();
+#endif
+    }
+  }
+}
+

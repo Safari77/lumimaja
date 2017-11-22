@@ -73,6 +73,17 @@ if(NOT HAVE_SODIUM_H)
   message(FATAL_ERROR "Please install libsodium from https://github.com/jedisct1/libsodium" )
 endif(NOT HAVE_SODIUM_H)
 
+option (NO_QR "Set ON to disable QR support" OFF)
+if (NOT NO_QR)
+  CHECK_LIBRARY_EXISTS(qrencode QRcode_free "qrencode.h" HAVE_LIBQRENCODE_DEV)
+  if(NOT HAVE_LIBQRENCODE_DEV)
+    unset(HAVE_LIBQRENCODE_DEV CACHE)
+    message( FATAL_ERROR "libqrencode-dev not installed: install or select NO_QR")
+  endif(NOT HAVE_LIBQRENCODE_DEV)
+else (NOT NO_QR)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_QR")
+endif (NOT NO_QR)
+
 if( NOT CMAKE_BUILD_TYPE )
   set( CMAKE_BUILD_TYPE Release )
 endif( NOT CMAKE_BUILD_TYPE )
@@ -104,6 +115,11 @@ if(HAVE_YKPERS_H)
   list(APPEND LUMIMAJA_SRCS src/os/linux/PWYubi.cpp src/ui/wxWidgets/yubicfg.cpp src/ui/wxWidgets/YubiMixin.cpp)
   list(APPEND LUMIMAJA_HDRS src/os/linux/PWYubi.h src/ui/wxWidgets/yubicfg.h src/ui/wxWidgets/YubiMixin.h)
 endif(HAVE_YKPERS_H)
+
+if (NOT NO_QR)
+  list(APPEND LUMIMAJA_SRCS src/ui/wxWidgets/pwsqrcodedlg.cpp src/ui/wxWidgets/pwsqrencode.cpp )
+  list(APPEND LUMIMAJA_HDR src/ui/wxWidgets/pwsqrcodedlg.h src/ui/wxWidgets/pwsqrencode.h)
+endif(NOT NO_QR)
 
 list(APPEND LUMIMAJA_HDRS
     src/core/Util.h
@@ -365,5 +381,8 @@ set_property(TARGET lumimaja PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE True)
 #  poor gcc!
 #    /usr/bin/gcc-ar cr libfoo.a CMakeFiles/foo.dir/foo.cpp.o
 #    Error running link command: Segmentation fault
+if (NOT NO_QR)
+  target_link_libraries(lumimaja qrencode ${CMAKE_REQUIRED_LIBRARIES})
+endif (NOT NO_QR)
 target_link_libraries(lumimaja ${wxWidgets_LIBRARIES} uuid Xtst X11 ${CMAKE_REQUIRED_LIBRARIES} ${XercesC_LIBRARY})
 

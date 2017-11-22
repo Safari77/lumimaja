@@ -110,6 +110,7 @@ enum {
   ID_EDITMENU_FIND_NEXT  = 10220,
   ID_EDITMENU_FIND_PREVIOUS,
   ID_PASSWORDSUBSET,
+  ID_PASSWORDQRCODE,
   ID_COPYEMAIL,
   ID_RUNCOMMAND,
   ID_COPYRUNCOMMAND,
@@ -374,6 +375,8 @@ public:
   void OnRestoreSafe(wxCommandEvent& evt);
 
   void OnVisitWebsite(wxCommandEvent&);
+
+  void OnPasswordQRCode(wxCommandEvent& evt);
 
 ////@begin PasswordSafeFrame member function declarations
 
