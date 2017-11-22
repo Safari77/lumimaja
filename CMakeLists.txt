@@ -361,7 +361,7 @@ list(APPEND LUMIMAJA_SRCS
 # XXX
 
 add_executable(lumimaja ${LUMIMAJA_SRCS})
-set_property(TARGET lumimaja PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+set_property(TARGET lumimaja PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE True)
 #  poor gcc!
 #    /usr/bin/gcc-ar cr libfoo.a CMakeFiles/foo.dir/foo.cpp.o
 #    Error running link command: Segmentation fault
