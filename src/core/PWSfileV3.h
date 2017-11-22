@@ -49,7 +49,8 @@ public:
     V3_ARGON2_I10,
 
     V3_ARGON2_D13,
-    V3_ARGON2_I13
+    V3_ARGON2_I13,
+    V3_ARGON2_ID13
   };
 
   enum V3_AEAD {

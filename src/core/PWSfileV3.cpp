@@ -61,6 +61,7 @@ static argon2funmap argon2funmaps[256] = {
   [PWSfileV3::V3_ARGON2_I10] = { Argon2_i,   ARGON2_VERSION_10, "i_v10" },
   [PWSfileV3::V3_ARGON2_D13] = { Argon2_d,   ARGON2_VERSION_13, "d_v13" },
   [PWSfileV3::V3_ARGON2_I13] = { Argon2_i,   ARGON2_VERSION_13, "i_v13" },
+  [PWSfileV3::V3_ARGON2_ID13] = { Argon2_id,   ARGON2_VERSION_13, "id_v13" },
 };
 
 bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *taghdr, unsigned char *out, size_t outlen,
@@ -109,7 +110,7 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
   ctx.version = muchfun.version;
   ctx.allocate_cbk = NULL;
   ctx.free_cbk = NULL;
-  ctx.flags = ARGON2_FLAG_CLEAR_PASSWORD | ARGON2_FLAG_CLEAR_MEMORY;
+  ctx.flags = ARGON2_FLAG_CLEAR_PASSWORD;
   aret = argon2_ctx(&ctx, muchfun.type);
   delete[] pstr;
 
