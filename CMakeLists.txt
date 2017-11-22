@@ -1,5 +1,5 @@
 # vim: paste
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.9) # CMP0069
 project (lumimaja CXX C)
 set (lumimaja_VERSION_MAJOR 0)
 set (lumimaja_VERSION_MINOR 98)
@@ -12,6 +12,8 @@ include(CheckLibraryExists)
 include(CheckIncludeFile)
 include(CheckCSourceCompiles)
 include(CheckCXXSourceCompiles)
+include(CheckIPOSupported)
+check_ipo_supported()
 enable_testing()
 
 check_include_file(stdint.h    HAVE_STDINT_H)
@@ -359,6 +361,9 @@ list(APPEND LUMIMAJA_SRCS
 # XXX
 
 add_executable(lumimaja ${LUMIMAJA_SRCS})
-set_property(TARGET lumimaja PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE True)
+set_property(TARGET lumimaja PROPERTY INTERPROCEDURAL_OPTIMIZATION True)
+#  poor gcc!
+#    /usr/bin/gcc-ar cr libfoo.a CMakeFiles/foo.dir/foo.cpp.o
+#    Error running link command: Segmentation fault
 target_link_libraries(lumimaja ${wxWidgets_LIBRARIES} uuid Xtst X11 ${CMAKE_REQUIRED_LIBRARIES} ${XercesC_LIBRARY})
 
