@@ -24,6 +24,10 @@ For new databases, Argon2_d version 1.3 is used.
 For backwards compatibility lumimaja supports reading version 1.0 databases
 with Argon2_d/Argon2_i types.
 
+Remember to change Argon2 parameters at
+  Manage → Options → Security → Argon2 memory usage / passes
+after you have initially added the passwords to your database.
+
 Lumimaja? My Finnish translation for "Snowden".
 
 Source code is licensed under Artistic License 2.0, see file LICENSE.
