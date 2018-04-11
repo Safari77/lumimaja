@@ -19,8 +19,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "argon2.h"
-#include "core.h"
+#include "argon2/argon2.h"
+#include "argon2/core.h"
 
 #include "blake2/blake2.h"
 #include "blake2/blamka-round-opt.h"

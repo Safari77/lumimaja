@@ -32,7 +32,7 @@ include(FindXercesC)
 find_package(XercesC REQUIRED)
 include_directories( ${XercesC_INCLUDE_DIR} )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DUSE_XML_LIBRARY=XERCES -DWCHAR_INCOMPATIBLE_XMLCH ${CMAKE_WXWINDOWS_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DA2_VISCTL=1 -DUSE_XML_LIBRARY=XERCES -DWCHAR_INCOMPATIBLE_XMLCH ${CMAKE_WXWINDOWS_CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -DDEBUG -gdwarf-4 -O0 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -D_FORTIFY_SOURCE=2 -fstack-protector-strong")
