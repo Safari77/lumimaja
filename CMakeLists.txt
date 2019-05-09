@@ -33,9 +33,13 @@ find_package(XercesC REQUIRED)
 include_directories( ${XercesC_INCLUDE_DIR} )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -DA2_VISCTL=1 -DUSE_XML_LIBRARY=XERCES -DWCHAR_INCOMPATIBLE_XMLCH ${CMAKE_WXWINDOWS_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=gnu++11")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG -DDEBUG -gdwarf-4 -O0 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -D_FORTIFY_SOURCE=2 -fstack-protector-strong")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fcf-protection=full --param=ssp-buffer-size=4")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fsanitize=safe-stack")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fstack-clash-protection")
+endif()
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 
@@ -378,6 +382,7 @@ list(APPEND LUMIMAJA_SRCS
 
 add_executable(lumimaja ${LUMIMAJA_SRCS})
 set_property(TARGET lumimaja PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE True)
+target_compile_features(lumimaja PUBLIC cxx_std_11)
 #  poor gcc!
 #    /usr/bin/gcc-ar cr libfoo.a CMakeFiles/foo.dir/foo.cpp.o
 #    Error running link command: Segmentation fault
