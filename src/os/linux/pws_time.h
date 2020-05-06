@@ -12,6 +12,13 @@
 #include <stdint.h>
 #include <time.h>
 
+#ifndef __TIME64_T_TYPE
+#define __TIME64_T_TYPE uint64_t
+#endif
+#ifndef time64_t
+typedef __TIME64_T_TYPE __time64_t;
+#endif
+
 extern struct tm *gmtime64_r(const __time64_t *timep, struct tm *result);
 
 namespace pws_os {
