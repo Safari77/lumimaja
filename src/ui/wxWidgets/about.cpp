@@ -152,7 +152,7 @@ void CAbout::CreateControls()
   wxStaticText* visitSiteStaticTextEnd = new wxStaticText(aboutDialog, wxID_STATIC, _("See LICENSE for open source details."), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
   rightSizer->Add(visitSiteStaticTextEnd, 0, wxALIGN_LEFT|wxALL, 5);
 
-  wxStaticText* copyrightStaticText = new wxStaticText(aboutDialog, wxID_STATIC, _("Copyright © 2003-2016 by Rony Shapiro, 2015-2016 by Sami Farin"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
+  wxStaticText* copyrightStaticText = new wxStaticText(aboutDialog, wxID_STATIC, _("Copyright © 2003-2016 by Rony Shapiro, 2015-2020 by Sami Farin"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT);
   rightSizer->Add(copyrightStaticText, 0, wxALIGN_LEFT|wxALL, 5);
 
   m_newVerStatus = new wxTextCtrl(aboutDialog, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY|wxNO_BORDER); //wxSize(aboutDialog->ConvertDialogToPixels(wxSize(120, -1)).x, -1)
