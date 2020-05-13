@@ -52,17 +52,8 @@ PWSfileV3::~PWSfileV3()
 typedef struct {
   argon2_type type;
   uint32_t version;
-  uint8_t name[8];
+  const char *name;
 } argon2funmap;
-
-// not overengineering at all
-static argon2funmap argon2funmaps[256] = {
-  [PWSfileV3::V3_ARGON2_D10] = { Argon2_d,   ARGON2_VERSION_10, "d_v10" },
-  [PWSfileV3::V3_ARGON2_I10] = { Argon2_i,   ARGON2_VERSION_10, "i_v10" },
-  [PWSfileV3::V3_ARGON2_D13] = { Argon2_d,   ARGON2_VERSION_13, "d_v13" },
-  [PWSfileV3::V3_ARGON2_I13] = { Argon2_i,   ARGON2_VERSION_13, "i_v13" },
-  [PWSfileV3::V3_ARGON2_ID13] = { Argon2_id,   ARGON2_VERSION_13, "id_v13" },
-};
 
 bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *taghdr, unsigned char *out, size_t outlen,
                                unsigned char *salt, size_t saltlen, uint32 t_cost, uint32 m_cost, uint32 nLanes)
@@ -70,17 +61,43 @@ bool PWSfileV3::Argon2HashPass(const StringX &passkey, const struct TAGHDR *tagh
   size_t passLen = 0;
   unsigned char *pstr = NULL;
   struct TAGHDR copytag = *taghdr;
-  argon2funmap muchfun = argon2funmaps[copytag.Argon2Type];
+  argon2funmap muchfun;
   int aret;
 
   if (!ConvertStringNFC(passkey, pstr, passLen)) {
     fprintf(stderr, "ConvertStringNFC failed\n");
     return false;
   }
-  
-  if (muchfun.version == 0) {
-    fprintf(stderr, "Argon2 error: unsupported type %u\n", copytag.Argon2Type);
-    return false;
+
+  switch (copytag.Argon2Type) {
+    case PWSfileV3::V3_ARGON2_D10:
+      muchfun.type = Argon2_d;
+      muchfun.version = ARGON2_VERSION_10;
+      muchfun.name = "d_v10";
+      break;
+    case PWSfileV3::V3_ARGON2_I10:
+      muchfun.type = Argon2_i;
+      muchfun.version = ARGON2_VERSION_10;
+      muchfun.name = "i_v10";
+      break;
+    case PWSfileV3::V3_ARGON2_D13:
+      muchfun.type = Argon2_d;
+      muchfun.version = ARGON2_VERSION_13;
+      muchfun.name = "d_v13";
+      break;
+    case PWSfileV3::V3_ARGON2_I13:
+      muchfun.type = Argon2_i;
+      muchfun.version = ARGON2_VERSION_13;
+      muchfun.name = "i_v13";
+      break;
+    case PWSfileV3::V3_ARGON2_ID13:
+      muchfun.type = Argon2_id;
+      muchfun.version = ARGON2_VERSION_13;
+      muchfun.name = "id_v13";
+      break;
+    default:
+      fprintf(stderr, "Argon2 error: unsupported type %u\n", copytag.Argon2Type);
+      return false;
   }
   /* password is cleared by Argon2 */
   fprintf(stderr, "Argon2%s version=%u outlen=%zu passlen=%zu saltlen=%zu t_cost=%u m_cost=%u nLanes=%u starting...",
@@ -578,7 +595,7 @@ int PWSfileV3::ReadHeader()
 
   sz64 += crypto_aead_chacha20poly1305_ABYTES;
   m_rawdata.resize(sz64);
-  m_nonce[0]++; // 😎 
+  m_nonce[0]++; // 😎
   size_t nread = fread(&m_rawdata[0], 1, sz64, m_fd);
   if (nread != sz64) {
     fprintf(stderr, "PWSfileV3::ReadHeader failed to read %lu bytes of "
