@@ -38,7 +38,7 @@ bool pws_os::GetRandomData(void *buf, unsigned long len)
       ret = getrandom(p, len, 0);
     } while ((ret == -1) && (errno == EINTR));
     if (ret <= 0) {
-      PWS_LOGIT_ARGS("getrandom failed: %s", strerror(errno));
+      fprintf(stderr, "getrandom failed: %s\n", strerror(errno));
       exit(1);
     }
     p += ret;
