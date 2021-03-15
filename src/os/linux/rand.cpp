@@ -10,61 +10,39 @@
  * \file Linux-specific implementation of rand.h
  */
 #include "../rand.h"
-#include <linux/random.h>
+#include "../os/logit.h"
+
+#include <sys/random.h>
 #ifndef _GNU_SOURCE
 #  define _GNU_SOURCE
 #endif
-#include <unistd.h>
-#include <sys/syscall.h>
 #include <string.h>
 #include <errno.h>
 
 using namespace std;
 
-static FILE *frandom;
-
 void pws_os::DeleteInstance(void)
 {
-  if (frandom) {
-    fclose(frandom);
-  }
-  frandom = NULL;
 }
 
-bool pws_os::GetRandomData(void *p, unsigned long len)
+bool pws_os::GetRandomData(void *buf, unsigned long len)
 {
+  ssize_t ret;
+  uint8_t *p = static_cast<uint8_t *>(buf);
+
   if (!len) return true;
-  if (len > 1048576) {
-    fprintf(stderr, "pws_os::GetRandomData requested %lu bytes p=%p\n", len, p);
-    exit(1);
-  }
-#if defined(SYS_getrandom) && defined(__linux__)
-  long ret;
-  do {
-    ret = syscall(SYS_getrandom, p, len, 0, 0, 0, 0);
-  } while ((ret == -1) && (errno == EINTR));
-  if (ret == len) return true;
-  if ((ret == -1) && (errno != ENOSYS)) {
-    fprintf(stderr, "pws_os::GetRandomData getrandom failed: %s\n",
-            strerror(errno));
-    exit(1);
-  }
-#else
-#  warning getrandom not supported
-#endif
-  if (frandom == NULL) {
-    frandom = fopen("/dev/urandom", "rb");
-    if (frandom == NULL) {
-		  fprintf(stderr, "pws_os::GetRandomData getrandom not supported and can't "
-              "open /dev/urandom: %s\n", strerror(errno));
+
+  while (len > 0) {
+    do {
+      errno = 0;
+      ret = getrandom(p, len, 0);
+    } while ((ret == -1) && (errno == EINTR));
+    if (ret <= 0) {
+      PWS_LOGIT_ARGS("getrandom failed: %s", strerror(errno));
       exit(1);
     }
-    setbuf(frandom, NULL);
-  }
-  if (fread(p, 1, len, frandom) != len) {
-    fprintf(stderr, "pws_os::GetRandomData failed to read /dev/urandom: %s\n",
-            strerror(errno));
-    exit(1);
+    p += ret;
+    len -= ret;
   }
   return true;
 }

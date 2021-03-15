@@ -52,9 +52,17 @@ uint32 PWSrand::RandUInt()
   return u;
 }
 
+uint64 PWSrand::RandUInt64()
+{
+  uint64 u;
+
+  GetRandomData(&u, sizeof(u));
+  return u;
+}
+
 stringT PWSrand::RandAZ(const size_t length)
 {
-  const uint8_t rndch[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+  static const uint8_t rndch[] = "abcdefghijklmnopqrstuvwxyz0123456789";
   stringT az;
   uint8_t stackaz[length];
 
@@ -62,14 +70,6 @@ stringT PWSrand::RandAZ(const size_t length)
   for (size_t i = 0; i < length; i++)
     az += rndch[stackaz[i] % (sizeof(rndch)-1)];
   return az;
-}
-
-uint64 PWSrand::RandUInt64()
-{
-  uint64 u;
-
-  GetRandomData(&u, sizeof(u));
-  return u;
 }
 
 /*
