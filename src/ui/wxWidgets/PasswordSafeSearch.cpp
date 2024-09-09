@@ -85,7 +85,7 @@ PasswordSafeSearch::~PasswordSafeSearch(void)
 void PasswordSafeSearch::OnSearchTextChanged(wxCommandEvent& evt)
 {
   wxSearchCtrl *srchCtrl = wxDynamicCast(evt.GetEventObject(), wxSearchCtrl);
-  srchCtrl->SetModified(true);
+  SetModified(true);
 }
 
 
@@ -114,12 +114,12 @@ void PasswordSafeSearch::OnDoSearchT(Iter begin, Iter end, Accessor afn)
   wxSearchCtrl* txtCtrl = wxDynamicCast(m_toolbar->FindControl(ID_FIND_EDITBOX), wxSearchCtrl);
   wxASSERT(txtCtrl);
 
-  const wxString searchText = txtCtrl->GetLineText(0);
+  const wxString searchText = txtCtrl->GetValue();
 
   if (searchText.IsEmpty())
     return;
 
-  if (m_criteria->IsDirty() || txtCtrl->IsModified() || m_searchPointer.IsEmpty())  {
+  if (m_criteria->IsDirty() || IsModified() || m_searchPointer.IsEmpty())  {
       m_searchPointer.Clear();
 
       if (!m_toolbar->GetToolState(ID_FIND_ADVANCED_OPTIONS))
@@ -131,7 +131,7 @@ void PasswordSafeSearch::OnDoSearchT(Iter begin, Iter end, Accessor afn)
                       m_criteria->CaseSensitive(), begin, end, afn);
 
       m_criteria->Clean();
-      txtCtrl->SetModified(false);
+      SetModified(false);
       m_searchPointer.InitIndex();
   }
   else {

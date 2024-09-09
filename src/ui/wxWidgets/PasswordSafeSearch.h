@@ -157,6 +157,9 @@ private:
   void HideSearchToolbar();
   void ClearToolbarStatusArea();
 
+  void SetModified(bool modified) { m_modified = modified; }
+  bool IsModified() { return m_modified; }
+
   template <class Iter, class Accessor>
   void OnDoSearchT( Iter begin, Iter end, Accessor afn);
 
@@ -164,6 +167,7 @@ private:
   PasswordSafeFrame*   m_parentFrame;
   SelectionCriteria*    m_criteria;
   SearchPointer        m_searchPointer;
+  bool                 m_modified;
 };
 
 #endif

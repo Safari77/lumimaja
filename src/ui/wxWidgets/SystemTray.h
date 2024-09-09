@@ -18,7 +18,7 @@
 
 class PasswordSafeFrame;
 
-class SystemTray : protected wxTaskBarIcon
+class SystemTray : public wxTaskBarIcon
 {
   public:
     typedef enum { TRAY_CLOSED, TRAY_UNLOCKED, TRAY_LOCKED } TrayStatus;
