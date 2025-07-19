@@ -3058,7 +3058,7 @@ void PWScore::UpdateExpiryEntry(const CUUID &uuid, const CItemData::FieldType ft
   ExpiredList::iterator iter;
 
   iter = std::find_if(m_ExpireCandidates.begin(), m_ExpireCandidates.end(),
-                      std::bind2nd(std::equal_to<pws_os::CUUID>(), uuid));
+                      [uuid](pws_os::CUUID v){return v == uuid;}); 
   if (iter == m_ExpireCandidates.end())
     return;
 

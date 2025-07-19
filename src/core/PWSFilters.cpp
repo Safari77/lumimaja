@@ -651,15 +651,14 @@ int PWSFilters::ImportFilterXMLFile(const FilterPool fpool,
 
   // By definition - all imported filters are complete!
   // Now set this.
-  PWSFilters::iterator mf_iter;
-  for (mf_iter = this->begin(); mf_iter != this->end(); mf_iter++) {
+  for (auto mf_iter = this->begin(); mf_iter != this->end(); mf_iter++) {
     st_filters &filters = mf_iter->second;
     for_each(filters.vMfldata.begin(), filters.vMfldata.end(),
-             mem_fun_ref(&st_FilterRow::SetFilterComplete));
+             mem_fn(&st_FilterRow::SetFilterComplete));
     for_each(filters.vHfldata.begin(), filters.vHfldata.end(),
-             mem_fun_ref(&st_FilterRow::SetFilterComplete));
+             mem_fn(&st_FilterRow::SetFilterComplete));
     for_each(filters.vPfldata.begin(), filters.vPfldata.end(),
-             mem_fun_ref(&st_FilterRow::SetFilterComplete));
+             mem_fn(&st_FilterRow::SetFilterComplete));
   }
   return PWScore::SUCCESS;
 }

@@ -46,14 +46,6 @@ private:
   ComparisonGridTable* m_table;
 };
 
-struct st_CompareData_match : public std::binary_function<st_CompareData, pws_os::CUUID, bool>
-{
-  result_type operator()(const first_argument_type& arg1, const second_argument_type& arg2) const
-  {
-    return arg1.uuid0 == arg2 || arg1.uuid1 == arg2;
-  }
-};
-
 ///////////////////////////////////////////////////////////
 // ComparisonGridTable
 // base class for the other two types of grid table
@@ -103,7 +95,7 @@ int ComparisonGridTable::GetNumberCols()
   return m_criteria->GetNumSelectedFields() - 1; 
 }
 
-void ComparisonGridTable::SetValue(int /*row*/, int /*col*/, const wxString& /*value*/)
+void ComparisonGridTable::SetValue(int WXUNUSED(row), int WXUNUSED(col), const wxString& WXUNUSED(value))
 {
 }
 
@@ -262,8 +254,8 @@ wxGridCellAttr* UniSafeCompareGridTable::GetAttr(int /*row*/, int /*col*/, wxGri
 int UniSafeCompareGridTable::GetItemRow(const pws_os::CUUID& uuid) const
 {
   CompareData::iterator itr = std::find_if(m_compData->begin(),
-                                            m_compData->end(),
-                                            std::bind2nd(st_CompareData_match(), uuid));
+                                           m_compData->end(),
+                                           [uuid](st_CompareData& arg){return arg.uuid0 == uuid || arg.uuid1 == uuid;});
   if (itr != m_compData->end())
     return std::distance(m_compData->begin(), itr);
   else
@@ -430,7 +422,7 @@ wxString MultiSafeCompareGridTable::GetValue(int row, int col)
   return retval;
 }
 
-wxGridCellAttr* MultiSafeCompareGridTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind /*kind*/)
+wxGridCellAttr* MultiSafeCompareGridTable::GetAttr(int row, int col, wxGridCellAttr::wxAttrKind WXUNUSED(kind))
 {
   //wxLogDebug(wxT("MultiSafeCompareGridTable::GetAttr called for %d, %d"), row, col);
   wxGridCellAttr* attr = ( row%2 == 0? m_currentAttr: m_comparisonAttr );
@@ -457,8 +449,8 @@ wxString MultiSafeCompareGridTable::GetRowLabelValue(int row)
 int MultiSafeCompareGridTable::GetItemRow(const pws_os::CUUID& uuid) const
 {
   CompareData::iterator itr = std::find_if(m_compData->begin(),
-                                            m_compData->end(),
-                                            std::bind2nd(st_CompareData_match(), uuid));
+                                           m_compData->end(),
+                                           [uuid](st_CompareData& arg){return arg.uuid0 == uuid || arg.uuid1 == uuid;});
   if (itr != m_compData->end())
     return std::distance(m_compData->begin(), itr)*2 + (itr->uuid0 == uuid? 0: 1);
   else
@@ -521,7 +513,11 @@ bool MultiSafeCompareGridTable::DeleteRows(size_t pos, size_t numRows)
 DEFINE_EVENT_TYPE(EVT_SELECT_GRID_ROW)
 
 BEGIN_EVENT_TABLE( ComparisonGrid, wxGrid )
+#if wxCHECK_VERSION(3, 1, 5)
+  EVT_GRID_RANGE_SELECTED(ComparisonGrid::OnGridRangeSelect)
+#else
   EVT_GRID_RANGE_SELECT(ComparisonGrid::OnGridRangeSelect)
+#endif
   EVT_COMMAND(wxID_ANY, EVT_SELECT_GRID_ROW, ComparisonGrid::OnAutoSelectGridRow)
 END_EVENT_TABLE()
 

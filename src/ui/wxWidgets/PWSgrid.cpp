@@ -242,13 +242,6 @@ void PWSGrid::RefreshItemField(const pws_os::CUUID& uuid, CItemData::FieldType f
   }
 }
 
-struct moveup : public std::binary_function<UUIDRowMapT::value_type, int, void> {
-  void operator()(UUIDRowMapT::value_type& v, int rowDeleted) const {
-    if (v.second > rowDeleted)
-      v.second = v.second - 1;
-  }
-};
-
 void PWSGrid::Remove(const CUUID &uuid)
 {
   UUIDRowMapT::iterator iter = m_uuid_map.find(uuid);
@@ -271,7 +264,8 @@ void PWSGrid::Remove(const CUUID &uuid)
 
     //subtract the row values of all entries in uuid map if it is greater
     //than the row we just deleted
-    std::for_each(m_uuid_map.begin(), m_uuid_map.end(), std::bind2nd(moveup(), row));
+    std::for_each(m_uuid_map.begin(), m_uuid_map.end(), [row](UUIDRowMapT::value_type &v)
+                  {if (v.second > row) v.second -= 1;} );
 
     //delete the item itself
     m_uuid_map.erase(iter);

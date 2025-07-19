@@ -259,13 +259,6 @@ void GetShortcutsFromMenu(wxMenu* menu, Iter cont_itr, const wxString& menuLabel
   }
 }
 
-struct SameShortcutTarget: public std::binary_function<st_prefShortcut, MenuItemData, bool>
-{
-  bool operator()(const st_prefShortcut& a, const MenuItemData& b) const {
-    return a.id == unsigned(b.GetMenuItem()->GetId());
-  }
-};
-
 struct ApplyEditedShortcuts {
   void operator()(MenuItemData& mi) const {
     if (mi.IsDirty()) {
@@ -288,7 +281,7 @@ void SetFont(wxGrid *grid, int row)
 
   struct FontAttr {
     wxFontWeight weight;
-    int          style;
+    wxFontStyle  style;
   } fattr[3][2] = {  // rows = {orig, custom, deleted}, cols = {shortcut, label}
     { {wxFONTWEIGHT_NORMAL, wxFONTSTYLE_NORMAL}, {wxFONTWEIGHT_NORMAL, wxFONTSTYLE_NORMAL} },
     { {wxFONTWEIGHT_BOLD,   wxFONTSTYLE_SLANT},  {wxFONTWEIGHT_BOLD,    wxFONTSTYLE_SLANT} },
@@ -423,7 +416,7 @@ int ModifiersToAccelFlags(int mods)
 
 bool PWSMenuShortcuts::IsDirty() const
 {
-  return std::find_if(m_midata.begin(), m_midata.end(), std::mem_fun_ref(&MenuItemData::IsDirty)) != m_midata.end();
+  return std::find_if(m_midata.begin(), m_midata.end(), [](const MenuItemData& a)->bool{return a.IsDirty();}) != m_midata.end();
 }
 
 /*
@@ -434,8 +427,8 @@ void PWSMenuShortcuts::ReadApplyUserShortcuts()
   typedef std::vector<st_prefShortcut> userShortcut_t;
   const std::vector<st_prefShortcut>& userShortcuts = PWSprefs::GetInstance()->GetPrefShortcuts();
   for (userShortcut_t::const_iterator usrItr = userShortcuts.begin(); usrItr != userShortcuts.end(); ++usrItr) {
-    MenuItemDataArray::iterator itr = std::find_if(m_midata.begin(), m_midata.end(),
-                            std::bind1st(SameShortcutTarget(), *usrItr));
+    auto itr = std::find_if(m_midata.begin(), m_midata.end(),
+                            [usrItr](MenuItemData& b){return usrItr->id == unsigned(b.GetMenuItem()->GetId());});
     if (itr != m_midata.end()) {
       itr->SetUserShortcut(*usrItr);
       itr->ApplyEffectiveShortcut();
@@ -546,14 +539,14 @@ void PWSMenuShortcuts::RemoveShortcutAt(size_t idx)
 void PWSMenuShortcuts::SetShorcutsGridEventHandlers(wxGrid* grid, wxButton* resetAllButton)
 {
   m_shortcutGridStatus.resize(m_midata.size());
-  std::transform(m_midata.begin(), m_midata.end(), m_shortcutGridStatus.begin(), std::mem_fun_ref(&MenuItemData::GetStatus));
+  std::transform(m_midata.begin(), m_midata.end(), m_shortcutGridStatus.begin(), [](MenuItemData& a){return a.GetStatus();} );
 
-  grid->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(PWSMenuShortcuts::OnShortcutChange), NULL, this);
-  grid->Connect(wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler(PWSMenuShortcuts::OnShortcutRightClick), NULL, this);
+  grid->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(PWSMenuShortcuts::OnShortcutChange), nullptr, this);
+  grid->Connect(wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler(PWSMenuShortcuts::OnShortcutRightClick), nullptr, this);
   //let's not directly connect to the grid for key events.  We'll only handle what bubbles up to us
-  grid->GetGridWindow()->Connect(grid->GetGridWindow()->GetId(), wxEVT_KEY_DOWN, wxKeyEventHandler(PWSMenuShortcuts::OnShortcutKey), NULL, this);
-  grid->GetGridWindow()->Connect(grid->GetGridWindow()->GetId(), wxEVT_CHAR, wxCharEventHandler(PWSMenuShortcuts::OnKeyChar), NULL, this);
-  resetAllButton->Connect(resetAllButton->GetId(), wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PWSMenuShortcuts::OnResetAll), NULL, this);
+  grid->GetGridWindow()->Connect(grid->GetGridWindow()->GetId(), wxEVT_KEY_DOWN, wxKeyEventHandler(PWSMenuShortcuts::OnShortcutKey), nullptr, this);
+  grid->GetGridWindow()->Connect(grid->GetGridWindow()->GetId(), wxEVT_CHAR, wxCharEventHandler(PWSMenuShortcuts::OnKeyChar), nullptr, this);
+  resetAllButton->Connect(resetAllButton->GetId(), wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PWSMenuShortcuts::OnResetAll), nullptr, this);
   m_shortcutsGrid = grid;
 }
 
@@ -590,6 +583,7 @@ void PWSMenuShortcuts::OnShortcutChange(wxGridEvent& evt)
 void PWSMenuShortcuts::OnShortcutKey(wxKeyEvent& evt)
 {
   wxWindow* gridWindow = wxDynamicCast(evt.GetEventObject(), wxWindow);
+  wxCHECK_RET(gridWindow, wxT("Could not get gridWindow from wxKeyEvent"));
   wxGrid* grid = wxDynamicCast(gridWindow->GetParent(), wxGrid);
   wxCHECK_RET(grid, wxT("Could not get grid from wxKeyEvent"));
   wxASSERT_MSG(grid == m_shortcutsGrid, wxT("Events from unexpected grid"));
@@ -655,7 +649,7 @@ void PWSMenuShortcuts::OnShortcutRightClick( wxGridEvent& evt )
   shortcutsMenu.Connect( shortcutsMenu.FindItemByPosition(0)->GetId(),
                           wxEVT_COMMAND_MENU_SELECTED,
                           wxCommandEventHandler(PWSMenuShortcuts::OnResetRemoveShortcut),
-                          NULL, this );
+                          nullptr, this );
   gr.grid->PopupMenu(&shortcutsMenu);
 }
 
@@ -771,5 +765,3 @@ bool ShortcutsGridValidator::Validate(wxWindow* parent)
   }
   return true;
 }
-
-
